@@ -10,6 +10,4 @@ module.exports = {
     EMAIL_REGEX,
     PHONE_REGEX,
     KTP_REGEX,
-    //USERNAME_REGEX,
-    //NAME_REGEX
 }

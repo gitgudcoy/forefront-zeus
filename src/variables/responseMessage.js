@@ -1,34 +1,20 @@
 // GENERALS ERRORS
 const UNIDENTIFIED_ERROR = "Something went wrong, please contact the support if you found this error !";
 
-// CREDENTIALS ERRORS
-const USER_HAS_ALREADY_BEEN_CREATED = "User has already been created";
-const INVALID_EMAIL = "Please input the valid email";
-const INVALID_KTP = "Please input the valid KTP ID";
-const INVALID_PHONE_NUMBER = "Please input the valid phone number";
-const USER_UNAUTHORIZED = "User unauthorized";
-const USER_ACCESS_FORBIDDEN = "User access forbidden";
-const USER_NOT_FOUND = "User not found";
-const WRONG_PASSWORD_INPUT = "Please input the right password";
-const USER_NOT_VERIFY = "Please verify first";
+// INTERNAL ERRORS
+const CANT_VALIDATE_RECOVERY_TOKEN = "Can't validate recovery token or the token might have been used. Please request the password recovery email again";
+const INTERNAL_ERROR_CANT_COMMUNICATE = "INTERNAL ERROR: Can't communicate with the other services.";
 
-// OTP
+// CREDENTIALS ERRORS
 const PLEASE_VERIFY_OTP = "PLEASE_VERIFY_OTP";
-const OTP_EXPIRED = "Your OTP has expired please re-send the OTP";
-const OTP_UNMATCH = "Invalid OTP input";
+const USER_UNAUTHORIZED = "User unauthorized";
+const SESSION_TOKEN_NOT_FOUND = "Session token not found or might be expired";
 
 module.exports = {
-    USER_HAS_ALREADY_BEEN_CREATED,
-    INVALID_EMAIL,
-    INVALID_KTP,
-    INVALID_PHONE_NUMBER,
-    USER_UNAUTHORIZED,
-    USER_ACCESS_FORBIDDEN,
-    USER_NOT_FOUND,
-    WRONG_PASSWORD_INPUT,
+    CANT_VALIDATE_RECOVERY_TOKEN,
+    INTERNAL_ERROR_CANT_COMMUNICATE,
     UNIDENTIFIED_ERROR,
-    USER_NOT_VERIFY,
+    USER_UNAUTHORIZED,
     PLEASE_VERIFY_OTP,
-    OTP_EXPIRED,
-    OTP_UNMATCH
+    SESSION_TOKEN_NOT_FOUND
 }

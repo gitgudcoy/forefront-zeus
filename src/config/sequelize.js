@@ -18,13 +18,16 @@ const InitDBSequelize = () => {
         dialect: 'mysql',
         logging: console.log,
         omitNull: false,
-        ssl: DBSSLConnectionConfiguration(),
+        dialectOptions: {
+            ssl: DBSSLConnectionConfiguration(),
+        },
         pool: {
             max: 20,
             min: 0,
             acquire: 60000,
             idle: 10000
         },
+        // The retry config if Deadlock Happened
         retry: {
             match: [/Deadlock/i],
             max: 3, // Maximum rety 3 times
@@ -41,11 +44,6 @@ const InitDBSequelize = () => {
 
     return DBConnectionString;
 }
-async function SequelizeRollback(trx, error) {
-    console.log(error);
-    console.log("There has been some error when commiting the transaction, rolling back...");
-    await trx.rollback();
-} 
 
 // Init the database
 const DBSequelize = InitDBSequelize();
@@ -54,9 +52,7 @@ const sequelizeSessionStore = new SessionStore({
     db: DBSequelize,
 });
 
-
 module.exports = {
     DBSequelize,
-    sequelizeSessionStore,
-    SequelizeRollback
+    sequelizeSessionStore
 }
