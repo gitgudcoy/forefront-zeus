@@ -1,28 +1,26 @@
 const {
     DataTypes,
+    UUIDV4
 } = require('sequelize');
 const { db } = require('../../config');
 
-
-
-const masterKategori = db.define("masterKategori", {
+const MasterType = db.define("MasterType", {
     id: {
         primaryKey: true,
         allowNull: false,
         unique: true,
-        type: DataTypes.STRING,        
+        type: DataTypes.UUID,
+        defaultValue: UUIDV4
     },
-    namaKategori: {
+    typeName: {
         allowNull: false,
+        unique: true,
         type: DataTypes.STRING,
-    }
-
     },
-{
-   
+}, {
     paranoid: true,
     deletedAt: 'destroyTime',
-    tableName: 'masterKategori'
+    tableName: 'master_type'
 });
 
-module.exports = { masterKategori }
+module.exports = { MasterType }
