@@ -11,11 +11,6 @@ const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
         type: DataTypes.UUID,
         defaultValue: UUIDV4
     },
-    storeId: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.UUID,
-    },
     catalogueCode: {
         allowNull: false,
         unique: true,

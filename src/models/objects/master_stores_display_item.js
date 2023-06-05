@@ -11,30 +11,9 @@ const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
         type: DataTypes.UUID,
         defaultValue: UUIDV4
     },
-    catalogueId: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.UUID,
-    },
-    storeId: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.UUID,
-    },
-    categoryId: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.UUID,
-    },
-    typeId: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.UUID,
-    },
     productCode: {
         allowNull: false,
         unique: true,
-        primaryKey: true,
         type: DataTypes.STRING,
     },
     productDescription: {

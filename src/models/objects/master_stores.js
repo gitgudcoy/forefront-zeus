@@ -11,16 +11,9 @@ const MasterStore = db.define("MasterStore", {
         type: DataTypes.UUID,
         defaultValue: UUIDV4
     },
-    userId: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.UUID,
-        defaultValue: null
-    },
     storeCode: {
         allowNull: false,
         unique: true,
-        primaryKey: true,
         type: DataTypes.STRING,
     },
     storeName: {

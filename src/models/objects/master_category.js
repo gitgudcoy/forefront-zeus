@@ -16,11 +16,6 @@ const MasterCategory = db.define("MasterCategory", {
         unique: true,
         type: DataTypes.STRING,
     },
-    categoryHashtag: {
-        allowNull: false,
-        unique: true,
-        type: DataTypes.STRING,
-    },
     status: {
         allowNull: false,
         unique: false,

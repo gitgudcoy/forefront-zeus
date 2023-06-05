@@ -9,25 +9,17 @@ const { MasterCategory } = require("./objects/master_category");
 const InitModels = async () => {
 
     // START ASSOCIATING
-    MasterUser.hasMany(MasterStore);
     MasterStore.belongsTo(MasterUser, {
         foreignKey: "userId",
     });
-
-    MasterStore.hasMany(MasterStoreCatalogue);
-    MasterStore.hasMany(MasterStoreDisplayItem);
-    MasterStoreCatalogue.hasMany(MasterStoreDisplayItem);
-    MasterStoreDisplayItem.belongsTo(MasterCategory, {
-        foreignKey: "categoryId",
+    MasterStoreDisplayItem.belongsTo(MasterStoreCatalogue, {
+        foreignKey: "catalogueId",
     });
     MasterStoreDisplayItem.belongsTo(MasterType, {
         foreignKey: "typeId",
     });
-    MasterStoreDisplayItem.belongsTo(MasterStore, {
-        foreignKey: "storeId",
-    });
-    MasterStoreDisplayItem.belongsTo(MasterStoreCatalogue, {
-        foreignKey: "catalogueId",
+    MasterStoreDisplayItem.belongsTo(MasterCategory, {
+        foreignKey: "categoryId",
     });
     MasterStoreCatalogue.belongsTo(MasterStore, {
         foreignKey: "storeId",
@@ -35,11 +27,13 @@ const InitModels = async () => {
     // END OF ASSOCIATING
 
     await db.sync({ alter: true, force: true })
-        .then(() => {
+        .then((res) => {
+            console.log(res)
             console.log("All models has been synchronized successfully.");
         }).catch((err) => {
             console.log(err);
-        }).finally(() => {
+        }).finally((fin) => {
+            console.log(fin)
             console.log("Model initialization completed");
         });
 }

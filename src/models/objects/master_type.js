@@ -17,6 +17,11 @@ const MasterType = db.define("MasterType", {
         unique: true,
         type: DataTypes.STRING,
     },
+    status: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
 }, {
     paranoid: true,
     deletedAt: 'destroyTime',
