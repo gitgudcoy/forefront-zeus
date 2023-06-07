@@ -24,6 +24,46 @@ const MasterStore = db.define("MasterStore", {
         unique: false,
         type: DataTypes.STRING,
     },
+    storePhone: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeWhatsapp: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeEmail: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeCity: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeSubdistrict: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeWard: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storePostalCode: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeLevel: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
     storeLevel: {
         allowNull: false,
         unique: false,
