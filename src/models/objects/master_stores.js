@@ -13,12 +13,10 @@ const MasterStore = db.define("MasterStore", {
     },
     storeCode: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
     },
     storeName: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
     },
     storeDescription: {
@@ -61,6 +59,11 @@ const MasterStore = db.define("MasterStore", {
         type: DataTypes.STRING,
     }
 }, {
+    indexes: [
+        { unique: true, fields: ["storeCode"] },
+        { unique: true, fields: ["storeName"] },
+        { unique: true, fields: ["userId"] },
+    ],
     paranoid: true,
     deletedAt: 'destroyTime',
     tableName: 'master_store'

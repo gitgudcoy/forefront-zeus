@@ -11,29 +11,32 @@ const InitModels = async () => {
     // START ASSOCIATING
     MasterStore.belongsTo(MasterUser, {
         foreignKey: "userId",
+        allowNull: false
     });
     MasterStoreDisplayItem.belongsTo(MasterStoreCatalogue, {
         foreignKey: "catalogueId",
+        allowNull: false
     });
     MasterStoreDisplayItem.belongsTo(MasterType, {
         foreignKey: "typeId",
+        allowNull: false
     });
     MasterStoreDisplayItem.belongsTo(MasterCategory, {
         foreignKey: "categoryId",
+        allowNull: false
     });
     MasterStoreCatalogue.belongsTo(MasterStore, {
         foreignKey: "storeId",
+        allowNull: false
     });
     // END OF ASSOCIATING
 
-    await db.sync({ alter: true, force: true })
-        .then((res) => {
-            console.log(res)
+    await db.sync({ alter: true, force: false })
+        .then(() => {
             console.log("All models has been synchronized successfully.");
         }).catch((err) => {
             console.log(err);
-        }).finally((fin) => {
-            console.log(fin)
+        }).finally(() => {
             console.log("Model initialization completed");
         });
 }

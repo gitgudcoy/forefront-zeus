@@ -14,7 +14,6 @@ const MasterType = db.define("MasterType", {
     },
     typeName: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
     },
     status: {
@@ -23,6 +22,9 @@ const MasterType = db.define("MasterType", {
         type: DataTypes.STRING,
     },
 }, {
+    indexes: [
+        { unique: true, fields: ["typeName"] },
+    ],
     paranoid: true,
     deletedAt: 'destroyTime',
     tableName: 'master_type'

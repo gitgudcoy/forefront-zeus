@@ -13,7 +13,6 @@ const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
     },
     catalogueCode: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
     },
     catalogueName: {
@@ -27,6 +26,10 @@ const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
         type: DataTypes.STRING,
     }
 }, {
+    indexes: [
+        { unique: true, fields: ["catalogueCode"] },
+        { unique: true, fields: ["storeId"] },
+    ],
     paranoid: true,
     deletedAt: 'destroyTime',
     tableName: 'master_store_catalogue'

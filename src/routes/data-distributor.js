@@ -6,8 +6,6 @@ const InitDataDistributorRoute = (app) => {
     * This route fetch all the user stores datasets
     */
     app.get(`/v${process.env.APP_MAJOR_VERSION}/user/:id/stores`, checkAuth, (req, res) => {
-        console.log(req.session)
-        console.log(req.user)
         return res.sendStatus(200);
     });
 }

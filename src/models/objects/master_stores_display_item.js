@@ -13,7 +13,6 @@ const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
     },
     productCode: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
     },
     productDescription: {
@@ -95,6 +94,12 @@ const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
         type: DataTypes.STRING,
     },
 }, {
+    indexes: [
+        { unique: true, fields: ["productCode"] },
+        { unique: true, fields: ["catalogueId"] },
+        { unique: true, fields: ["typeId"] },
+        { unique: true, fields: ["categoryId"] },
+    ],
     paranoid: true,
     deletedAt: 'destroyTime',
     tableName: 'master_store_display_item'

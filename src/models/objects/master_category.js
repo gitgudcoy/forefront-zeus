@@ -13,7 +13,6 @@ const MasterCategory = db.define("MasterCategory", {
     },
     categoryName: {
         allowNull: false,
-        unique: true,
         type: DataTypes.STRING,
     },
     status: {
@@ -22,6 +21,9 @@ const MasterCategory = db.define("MasterCategory", {
         type: DataTypes.STRING,
     },
 }, {
+    indexes: [
+        { unique: true, fields: ["categoryName"] },
+    ],
     paranoid: true,
     deletedAt: 'destroyTime',
     tableName: 'master_category'
