@@ -39,17 +39,22 @@ const MasterStore = db.define("MasterStore", {
         unique: false,
         type: DataTypes.STRING,
     },
-    storeCity: {
+    storeProvince: {
         allowNull: false,
         unique: false,
         type: DataTypes.STRING,
     },
-    storeSubdistrict: {
+    storeRegency: {
         allowNull: false,
         unique: false,
         type: DataTypes.STRING,
     },
-    storeWard: {
+    storeDistrict: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.STRING,
+    },
+    storeVillage: {
         allowNull: false,
         unique: false,
         type: DataTypes.STRING,
@@ -102,7 +107,6 @@ const MasterStore = db.define("MasterStore", {
     indexes: [
         { unique: true, fields: ["storeCode"] },
         { unique: true, fields: ["storeName"] },
-        { unique: true, fields: ["userId"] },
     ],
     paranoid: true,
     deletedAt: 'destroyTime',

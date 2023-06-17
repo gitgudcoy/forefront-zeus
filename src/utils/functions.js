@@ -3,6 +3,7 @@ const {
     SEQUELIZE_VALIDATION_ERROR,
     SEQUELIZE_UNIQUE_CONSTRAINT_ERROR
 } = require('../variables/dbError');
+const { KEY_HAS_TO_BE_UNIQUE } = require('../variables/responseMessage');
 
 function SequelizeErrorHandling(err, res) {
     var errMessages = [];
@@ -23,9 +24,9 @@ function SequelizeErrorHandling(err, res) {
         err.errors.forEach((err) => errMessages.push(err.message));
         return res.status(400).send({
             ...errMessages,
-            possibility: USER_HAS_ALREADY_BEEN_CREATED
+            possibility: KEY_HAS_TO_BE_UNIQUE
         });
-    } else return res.status(500).send(UNIDENTIFIED_ERROR);
+    } else return res.status(400).send(err.toString());
 }
 
 async function SequelizeRollback(trx, error) {

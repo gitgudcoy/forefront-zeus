@@ -9,25 +9,40 @@ const { MasterCategory } = require("./objects/master_category");
 const InitModels = async () => {
 
     // START ASSOCIATING
+    // MasterUser.hasMany(MasterStore);
+    // MasterStoreCatalogue.hasMany(MasterStoreDisplayItem);
+    // MasterType.hasMany(MasterStoreDisplayItem);
+    // MasterCategory.hasMany(MasterStoreDisplayItem);
+    // MasterStore.hasMany(MasterStoreCatalogue);
     MasterStore.belongsTo(MasterUser, {
-        foreignKey: "userId",
-        allowNull: false
+        foreignKey: {
+            name: "userId",
+            allowNull: false
+        }
     });
     MasterStoreDisplayItem.belongsTo(MasterStoreCatalogue, {
-        foreignKey: "catalogueId",
-        allowNull: false
+        foreignKey: {
+            name: "catalogueId",
+            allowNull: false
+        }
     });
     MasterStoreDisplayItem.belongsTo(MasterType, {
-        foreignKey: "typeId",
-        allowNull: false
+        foreignKey: {
+            name: "typeId",
+            allowNull: false
+        }
     });
     MasterStoreDisplayItem.belongsTo(MasterCategory, {
-        foreignKey: "categoryId",
-        allowNull: false
+        foreignKey: {
+            name: "categoryId",
+            allowNull: false
+        }
     });
     MasterStoreCatalogue.belongsTo(MasterStore, {
-        foreignKey: "storeId",
-        allowNull: false
+        foreignKey: {
+            name: "storeId",
+            allowNull: false
+        }
     });
     // END OF ASSOCIATING
 

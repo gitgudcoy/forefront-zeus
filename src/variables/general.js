@@ -15,10 +15,18 @@ const POST_SEND_PROFILEPIC = "POST_SEND_PROFILEPIC";
 const SEND_OTP = "SEND_OTP";
 
 // EMAIL SUBJECT
-const OTP_EMAIL = "Account Registration - Here is your OTP number";
+const OTP_EMAIL = "Account Registration - Berikut adalah nomor OTPmu, jangan disebar ya !";
 
 // API URLs
 const CHECK_AUTH_TOKEN = `/v${process.env.APP_OLYMPUS_SERVICE_MAJOR_VERSION}/auth/check`;
+
+// Others
+const ALPHABETH_CHAR_AND_NUMBER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+// STATUSES
+const ACTIVE = "ACTIVE";
+const NON_ACTIVE = "NON_ACTIVE";
+const DELETED = "DELETED";
 
 module.exports = {
     POST_ADD_CATALOGUE,
@@ -30,5 +38,9 @@ module.exports = {
     GET_CHECK_AUTH_TOKEN,
     SEND_OTP,
     OTP_EMAIL,
-    CHECK_AUTH_TOKEN
+    CHECK_AUTH_TOKEN,
+    ALPHABETH_CHAR_AND_NUMBER,
+    ACTIVE,
+    NON_ACTIVE,
+    DELETED
 }

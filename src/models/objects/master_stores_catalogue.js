@@ -28,7 +28,6 @@ const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
 }, {
     indexes: [
         { unique: true, fields: ["catalogueCode"] },
-        { unique: true, fields: ["storeId"] },
     ],
     paranoid: true,
     deletedAt: 'destroyTime',

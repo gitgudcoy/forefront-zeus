@@ -96,9 +96,6 @@ const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
 }, {
     indexes: [
         { unique: true, fields: ["productCode"] },
-        { unique: true, fields: ["catalogueId"] },
-        { unique: true, fields: ["typeId"] },
-        { unique: true, fields: ["categoryId"] },
     ],
     paranoid: true,
     deletedAt: 'destroyTime',
