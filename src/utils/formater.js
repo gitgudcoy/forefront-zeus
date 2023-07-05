@@ -6,7 +6,7 @@ function generateProductCode(storeId, namaBarang) {
     return product
 }
 
-function generateCode(length, user) {
+function generateCode(length, user, prefix) {
     // program to generate random strings
     // declare all characters
     const characters = ALPHABETH_CHAR_AND_NUMBER;
@@ -19,7 +19,8 @@ function generateCode(length, user) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
 
-        let finalCode = result.charAt(0).toUpperCase() +
+        let finalCode = prefix +
+            result.charAt(0).toUpperCase() +
             "/" + result.charAt(result.length - 1).toUpperCase() +
             "-" + user.fullName.charAt(0).toUpperCase() +
             "/" + Math.floor(Math.random() * charactersLength) + Math.floor(Math.random() * charactersLength) + Math.floor(Math.random() * charactersLength) +

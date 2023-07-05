@@ -11,86 +11,68 @@ const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
         type: DataTypes.UUID,
         defaultValue: UUIDV4
     },
+    productName: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
     productCode: {
         allowNull: false,
         type: DataTypes.STRING,
     },
     productDescription: {
         allowNull: false,
-        unique: false,
+        type: DataTypes.STRING,
+    },
+    productHashtag: {
+        allowNull: false,
         type: DataTypes.STRING,
     },
     productCondition: {
         allowNull: false,
-        unique: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
     },
     productWeight: {
         allowNull: false,
-        unique: false,
         type: DataTypes.FLOAT,
     },
-    productPrices: {
+    productBidPrice: {
         allowNull: false,
-        unique: false,
+        type: DataTypes.DECIMAL,
+    },
+    productBINPrice: {
+        allowNull: false,
+        type: DataTypes.DECIMAL,
+    },
+    productBidMultiplication: {
+        allowNull: false,
+        type: DataTypes.DECIMAL,
+    },
+    productBidMultiplicationPeriod: {
+        allowNull: false,
         type: DataTypes.STRING,
+    },
+    productBidPeriod: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
+    productStocks: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
     },
     productRating: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         validate: {
             min: 0,
             max: 5
         }
     },
-    pickupCity: {
+    availableCourierList: {
         allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    pickupSubdistrict: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    pickupWard: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    pickupAddress: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    pickupPostalCode: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.INTEGER,
-    },
-    productMaxWaitTime: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.INTEGER,
-    },
-    productMaxWaitTimePeriod: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    productHashtag: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    courierList: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
+        type: DataTypes.JSON,
     },
     status: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
 }, {

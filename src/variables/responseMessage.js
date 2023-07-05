@@ -20,9 +20,25 @@ const INVALID_STORE_EMAIL = "Mohon input alamat email toko dengan benar";
 const INVALID_STORE_ADDRESS = "Mohon input alamat toko dengan benar";
 const INVALID_STORE_PROVINCE = "Mohon input provinsi dengan benar";
 const INVALID_STORE_REGENCY = "Mohon input kota dengan benar";
-const INVALID_STORE_DISTRICT = "Mohon input kelurahan dengan benar";
-const INVALID_STORE_VILLAGE = "Mohon input kecamatan dengan benar";
+const INVALID_STORE_DISTRICT = "Mohon input kecamatan dengan benar";
+const INVALID_STORE_VILLAGE = "Mohon input kelurahan dengan benar";
 const INVALID_STORE_POSTAL_CODE = "Mohon input kode pos dengan benar";
+
+// PRODUCT DISPLAY VALIDATIONS
+const INVALID_PRODUCT_NAME = "Mohon input nama produk dengan benar \n\n 1. Nama produk minimal terdiri dari 3 karakter alfabet";
+const INVALID_PRODUCT_CATEGORY = "Mohon input kategori produk dengan benar";
+const INVALID_PRODUCT_CATALOG = "Mohon input nama katalog dengan benar";
+const INVALID_PRODUCT_DESCRIPTION = "Mohon input deskripsi produk dengan benar";
+const INVALID_PRODUCT_HASHTAG = "Mohon input hashtag produk dengan benar";
+const INVALID_PRODUCT_CONDITION = "Mohon input kondisi produk dengan benar";
+const INVALID_PRODUCT_WEIGHT = "Mohon input berat produk benar";
+const INVALID_PRODUCT_BID_PRICE = "Mohon input harga lelang dengan benar";
+const INVALID_PRODUCT_BIN_PRICE = "Mohon input harga buy it now dengan benar";
+const INVALID_PRODUCT_BID_MULTIPLICATION = "Mohon harga kelipatan lelang dengan benar";
+const INVALID_PRODUCT_BID_MULTIPLICATION_PERIOD = "Mohon input periode kelipatan lelang dengan benar";
+const INVALID_PRODUCT_BID_PERIOD = "Mohon input periode lelang dengan benar";
+const INVALID_PRODUCT_STOCKS = "Mohon input jumlah stok dengan benar";
+const INVALID_COURIER_CHOOSEN = "Mohon input kurir yang dapat digunakan untuk penjemputan dengan benar";
 
 module.exports = {
     STORE_ALREADY_EXIST,
@@ -43,4 +59,18 @@ module.exports = {
     INVALID_STORE_DISTRICT,
     INVALID_STORE_VILLAGE,
     INVALID_STORE_POSTAL_CODE,
+    INVALID_PRODUCT_NAME,
+    INVALID_PRODUCT_CATEGORY,
+    INVALID_PRODUCT_CATALOG,
+    INVALID_PRODUCT_DESCRIPTION,
+    INVALID_PRODUCT_HASHTAG,
+    INVALID_PRODUCT_CONDITION,
+    INVALID_PRODUCT_WEIGHT,
+    INVALID_PRODUCT_BID_PRICE,
+    INVALID_PRODUCT_BIN_PRICE,
+    INVALID_PRODUCT_BID_MULTIPLICATION,
+    INVALID_PRODUCT_BID_MULTIPLICATION_PERIOD,
+    INVALID_PRODUCT_BID_PERIOD,
+    INVALID_PRODUCT_STOCKS,
+    INVALID_COURIER_CHOOSEN,
 }

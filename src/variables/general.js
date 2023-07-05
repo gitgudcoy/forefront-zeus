@@ -1,7 +1,10 @@
-const POST_ADD_CATALOGUE = "POST_ADD_KATEGORI";
 // GENERAL
 const USER = "USER";
 const SUCCESS = "SUCCESS";
+
+// PREFIXES
+const STR = "STR"; // this is the prefix for store code
+const PRD = "PRD"; // this is the prefix for product code
 
 // AXIOS
 const POST = "POST";
@@ -10,6 +13,7 @@ const GET = "GET";
 // AXIOS LOG TITLE
 const GET_CHECK_AUTH_TOKEN = "GET_CHECK_AUTH_TOKEN";
 const POST_SEND_PROFILEPIC = "POST_SEND_PROFILEPIC";
+const POST_ADD_CATALOGUE = "POST_ADD_KATEGORI";
 
 // EMAIL TYPE
 const SEND_OTP = "SEND_OTP";
@@ -20,27 +24,41 @@ const OTP_EMAIL = "Account Registration - Berikut adalah nomor OTPmu, jangan dis
 // API URLs
 const CHECK_AUTH_TOKEN = `/v${process.env.APP_OLYMPUS_SERVICE_MAJOR_VERSION}/auth/check`;
 
-// Others
-const ALPHABETH_CHAR_AND_NUMBER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
 // STATUSES
 const ACTIVE = "ACTIVE";
 const NON_ACTIVE = "NON_ACTIVE";
 const DELETED = "DELETED";
+
+// DEFAULT VALUES
+const PROVINCE_DEFAULT_VALUE = "PILIH PROVINSI";
+const REGENCY_DEFAULT_VALUE = "PILIH KOTA";
+const DISTRICT_DEFAULT_VALUE = "PILIH KECAMATAN";
+const VILLAGE_DEFAULT_VALUE = "PILIH KELURAHAN";
+
+// OTHERS
+const EMPTY_STRING = "";
+const ALPHABETH_CHAR_AND_NUMBER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 module.exports = {
     POST_ADD_CATALOGUE,
     POST_SEND_PROFILEPIC,
     USER,
     SUCCESS,
+    STR,
+    PRD,
     POST,
     GET,
     GET_CHECK_AUTH_TOKEN,
     SEND_OTP,
     OTP_EMAIL,
     CHECK_AUTH_TOKEN,
+    EMPTY_STRING,
     ALPHABETH_CHAR_AND_NUMBER,
     ACTIVE,
     NON_ACTIVE,
-    DELETED
+    DELETED,
+    PROVINCE_DEFAULT_VALUE,
+    REGENCY_DEFAULT_VALUE,
+    DISTRICT_DEFAULT_VALUE,
+    VILLAGE_DEFAULT_VALUE,
 }

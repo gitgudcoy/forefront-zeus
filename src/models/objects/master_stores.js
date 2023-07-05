@@ -21,62 +21,47 @@ const MasterStore = db.define("MasterStore", {
     },
     storeDescription: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storePhone: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeWhatsapp: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeEmail: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeProvince: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeRegency: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeDistrict: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeVillage: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storePostalCode: {
         allowNull: false,
-        unique: false,
         type: DataTypes.STRING,
     },
     storeLevel: {
         allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
-    },
-    storeLevel: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
     },
     storeQualityRating: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         validate: {
             min: 0,
             max: 5
@@ -84,7 +69,7 @@ const MasterStore = db.define("MasterStore", {
     },
     storeSpeedRating: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         validate: {
             min: 0,
             max: 5
@@ -92,7 +77,7 @@ const MasterStore = db.define("MasterStore", {
     },
     storeServiceRating: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         validate: {
             min: 0,
             max: 5

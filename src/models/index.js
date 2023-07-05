@@ -3,7 +3,6 @@ const { MasterStore } = require("./objects/master_stores");
 const { MasterStoreDisplayItem } = require("./objects/master_stores_display_item");
 const { MasterStoreCatalogue } = require("./objects/master_stores_catalogue");
 const { MasterUser } = require("./user/master_user");
-const { MasterType } = require("./objects/master_type");
 const { MasterCategory } = require("./objects/master_category");
 
 const InitModels = async () => {
@@ -23,12 +22,6 @@ const InitModels = async () => {
     MasterStoreDisplayItem.belongsTo(MasterStoreCatalogue, {
         foreignKey: {
             name: "catalogueId",
-            allowNull: false
-        }
-    });
-    MasterStoreDisplayItem.belongsTo(MasterType, {
-        foreignKey: {
-            name: "typeId",
             allowNull: false
         }
     });
