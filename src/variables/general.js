@@ -1,10 +1,13 @@
 // GENERAL
 const USER = "USER";
 const SUCCESS = "SUCCESS";
+const PRODUCT_CATALOGUE_IMAGE = "PRODUCT_CATALOGUE_IMAGE";
+const PRODUCT_CATALOGUE_ADDITIONAL_FILES = "PRODUCT_CATALOGUE_ADDITIONAL_FILES";
 
 // PREFIXES
 const STR = "STR"; // this is the prefix for store code
 const PRD = "PRD"; // this is the prefix for product code
+const CLOG = "CLOG"; // this is the prefix for catalogue code
 
 // AXIOS
 const POST = "POST";
@@ -42,10 +45,13 @@ const ALPHABETH_CHAR_AND_NUMBER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrs
 module.exports = {
     POST_ADD_CATALOGUE,
     POST_SEND_PROFILEPIC,
+    PRODUCT_CATALOGUE_IMAGE,
+    PRODUCT_CATALOGUE_ADDITIONAL_FILES,
     USER,
     SUCCESS,
     STR,
     PRD,
+    CLOG,
     POST,
     GET,
     GET_CHECK_AUTH_TOKEN,

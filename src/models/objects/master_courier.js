@@ -3,7 +3,7 @@ const {
 } = require('sequelize');
 const { db } = require('../../config');
 
-const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
+const MasterCourier = db.define("MasterCourier", {
     id: {
         primaryKey: true,
         allowNull: false,
@@ -11,11 +11,7 @@ const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
         type: DataTypes.UUID,
         defaultValue: UUIDV4
     },
-    catalogueCode: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    catalogueName: {
+    courierName: {
         allowNull: false,
         type: DataTypes.STRING,
     },
@@ -26,12 +22,11 @@ const MasterStoreCatalogue = db.define("MasterStoreCatalogue", {
     },
 }, {
     indexes: [
-        { unique: true, fields: ["catalogueCode"] },
-        { unique: true, fields: ["catalogueName"] },
+        { unique: true, fields: ["courierName"] },
     ],
     paranoid: true,
     deletedAt: 'destroyTime',
-    tableName: 'master_store_catalogue'
+    tableName: 'master_courier'
 });
 
-module.exports = { MasterStoreCatalogue }
+module.exports = { MasterCourier }

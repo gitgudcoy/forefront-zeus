@@ -1,17 +1,23 @@
 const { db } = require("../config");
+const { MasterCategory } = require("../models/objects/master_category");
+const { MasterFile } = require("../models/objects/master_file");
 const { MasterStore } = require("../models/objects/master_stores");
+const { MasterStoreCatalogue } = require("../models/objects/master_stores_catalogue");
+const { MasterStoreDisplayItem } = require("../models/objects/master_stores_display_item");
 const { generateCode } = require("../utils/formater");
-const { SequelizeRollback, SequelizeErrorHandling } = require("../utils/functions");
+const { SequelizeRollback, SequelizeErrorHandling, createMasterFile } = require("../utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
     validateStoreInfo,
     validateProductDisplayInfo
 } = require("../utils/validator");
-const { ACTIVE, STR, PRD } = require("../variables/general");
+const { ACTIVE, STR, PRD, CLOG, PRODUCT_CATALOGUE_IMAGE, PRODUCT_CATALOGUE_ADDITIONAL_FILES } = require("../variables/general");
 const {
     UNIDENTIFIED_ERROR,
     STORE_ALREADY_EXIST,
 } = require("../variables/responseMessage");
+const multer = require('multer')
+const productUpload = multer({ dest: 'uploads/product-files' })
 
 const InitDataStoringRoute = (app) => {
 
@@ -43,9 +49,8 @@ const InitDataStoringRoute = (app) => {
             });
 
             const newStoreCode = generateCode(8, req.user, STR);
-            var newStore = null;
             if (!existing) {
-                newStore = await MasterStore.create({
+                await MasterStore.create({
                     storeName: storeInfo.storeName,
                     storeDescription: storeInfo.storeDescription,
                     storeCode: newStoreCode,
@@ -78,40 +83,83 @@ const InitDataStoringRoute = (app) => {
 
     // POST Method
     // Route: /{version}/user/:id/stores/add
-    // This route will store users newly added product, it doesn't need approval for now
-    app.post(`/v${process.env.APP_MAJOR_VERSION}/store/:id/product/add`, checkAuth, async (req, res) => {
+    // This route will store users newly added product and catalogue, it doesn't need approval for now
+    app.post(`/v${process.env.APP_MAJOR_VERSION}/store/catalogues/add`, checkAuth, productUpload.fields([
+        { name: 'uploadedImageFiles', maxCount: 5 },
+        { name: 'uploadedAdditionalFiles', maxCount: 5 }
+    ]), async (req, res) => {
         // check query param availability
         if (!req.body) return res.status(400).send(UNIDENTIFIED_ERROR);
-        if (!req.params) return res.status(400).send(UNIDENTIFIED_ERROR);
+        if (!req.query) return res.status(400).send(UNIDENTIFIED_ERROR);
 
         // Validate req body
         const validationResult = validateProductDisplayInfo(req.body)
         if (!validationResult.result) return res.status(400).send(validationResult.message);
 
         // Get the request body
-        const productInfo = {
-            ...req.body,
-            storeId: req.params.code
-        };
+        const productInfo = req.body;
         const trx = await db.transaction();
         try {
-            const newProductCode = generateCode(8, req.user, PRD);
-            var newProduct = null;
-            if (!existing) {
-                newProduct = await MasterStore.create({
-                    productName: productInfo.productName,
-                    productCode: newProductCode,
-                    productDescription: productInfo.storeDescription,
-                    productCondition: productInfo.productCondition,
-                    productWeight: productInfo.productWeight,
-                    productRating: 0,
-                    storeId: productInfo.userId,
-                    status: ACTIVE
-                }, { transaction: trx });
-
-                await trx.commit();
-            } else return res.status(409).send(STORE_ALREADY_EXIST);
-            return res.sendStatus(200);
+            // insert new catalogues
+            await MasterStore.findOne({
+                where: {
+                    storeCode: req.query.code
+                }
+            }).then(async (result) => {
+                await MasterStoreCatalogue.bulkCreate(JSON.parse(productInfo.newCatalogues).map((obj) => {
+                    return {
+                        id: obj.id,
+                        catalogueName: obj.catalogueName,
+                        catalogueCode: generateCode(8, req.user, CLOG),
+                        storeId: result.id,
+                        status: ACTIVE
+                    }
+                }), {
+                    ignoreDuplicates: true,
+                    transaction: trx
+                }).then(async (result) => {
+                    await MasterStoreDisplayItem.create({
+                        productName: productInfo.productName,
+                        productCode: generateCode(8, req.user, PRD),
+                        productDescription: productInfo.productDescription,
+                        productHashtag: productInfo.productHashtag,
+                        productCondition: productInfo.productCondition,
+                        productWeight: productInfo.productWeight,
+                        productBidPrice: productInfo.productBidPrice,
+                        productBINPrice: productInfo.productBINPrice,
+                        productBidMultiplication: productInfo.productBidMultiplication,
+                        productBidMultiplicationPeriod: productInfo.productBidMultiplicationPeriod,
+                        productBidPeriod: productInfo.productBidPeriod,
+                        productStocks: productInfo.productStocks,
+                        productRating: 0,
+                        availableCourierList: productInfo.courierChoosen,
+                        status: ACTIVE,
+                        categoryId: JSON.parse(productInfo.productCategory).id,
+                        catalogueId: result.filter((obj) => obj.catalogueName === productInfo.productCatalog)[0].id,
+                    }, { transaction: trx }).then(async (result) => {
+                        // insert uploaded image
+                        let uploadedImageFiles = req.files['uploadedImageFiles'] ? req.files['uploadedImageFiles'] : [];
+                        let uploadedAdditionalFiles = req.files['uploadedAdditionalFiles'] ? req.files['uploadedAdditionalFiles'] : [];
+                        const fileConcat = uploadedImageFiles.map((obj) => {
+                            return createMasterFile(obj, PRODUCT_CATALOGUE_IMAGE, `${obj.destination}/${obj.filename}`, {
+                                displayItemId: result.id
+                            });
+                        }).concat(uploadedAdditionalFiles.map((obj) => {
+                            return createMasterFile(obj, PRODUCT_CATALOGUE_ADDITIONAL_FILES, `${obj.destination}/${obj.filename}`, {
+                                displayItemId: result.id
+                            });
+                        }));
+                        await MasterFile.bulkCreate(fileConcat.map((obj) => {
+                            return createMasterFile(obj, obj.fileType, obj.destination, {
+                                displayItemId: obj.displayItemId
+                            });
+                        }), { transaction: trx }).then(async () => {
+                            await trx.commit();
+                            return res.sendStatus(200);
+                        })
+                    });
+                });
+            });
         } catch (error) {
             await SequelizeRollback(trx, error);
             SequelizeErrorHandling(error, res);

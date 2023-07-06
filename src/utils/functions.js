@@ -3,7 +3,14 @@ const {
     SEQUELIZE_VALIDATION_ERROR,
     SEQUELIZE_UNIQUE_CONSTRAINT_ERROR
 } = require('../variables/dbError');
+const { ACTIVE } = require('../variables/general');
 const { KEY_HAS_TO_BE_UNIQUE } = require('../variables/responseMessage');
+
+async function SequelizeRollback(trx, error) {
+    console.log(error);
+    console.log("There has been some error when commiting the transaction, rolling back...");
+    await trx.rollback();
+}
 
 function SequelizeErrorHandling(err, res) {
     var errMessages = [];
@@ -29,15 +36,22 @@ function SequelizeErrorHandling(err, res) {
     } else return res.status(400).send(err.toString());
 }
 
-async function SequelizeRollback(trx, error) {
-    console.log(error);
-    console.log("There has been some error when commiting the transaction, rolling back...");
-    await trx.rollback();
+function createMasterFile(file, fileType, destination, ids) {
+    return {
+        filename: file.filename,
+        encoding: file.encoding,
+        mimetype: file.mimetype,
+        fileType: fileType,
+        destination: destination,
+        displayItemId: ids.displayItemId,
+        status: ACTIVE
+    }
 }
 
 module.exports = {
     SequelizeErrorHandling,
-    SequelizeRollback
+    SequelizeRollback,
+    createMasterFile
 }
 
 

@@ -7,6 +7,7 @@ const { UNIDENTIFIED_ERROR } = require("../variables/responseMessage");
 const { MasterStoreCatalogue } = require("../models/objects/master_stores_catalogue");
 const { MasterCategory } = require("../models/objects/master_category");
 const { ACTIVE } = require("../variables/general");
+const { MasterCourier } = require("../models/objects/master_courier");
 
 const InitDataDistributorRoute = (app) => {
 
@@ -35,18 +36,19 @@ const InitDataDistributorRoute = (app) => {
     * ROUTE: /{version}/store/:id/catalogues
     * This route fetch all the selected store catalog datasets
     */
-    app.get(`/v${process.env.APP_MAJOR_VERSION}/store/:id/catalogues`, checkAuth, async (req, res) => {
+    app.get(`/v${process.env.APP_MAJOR_VERSION}/store/catalogues`, checkAuth, async (req, res) => {
         // check query param availability
         if (!req.params) return res.status(400).send(UNIDENTIFIED_ERROR);
+        if (!req.query) return res.status(400).send(UNIDENTIFIED_ERROR);
         // Get the request body
-        const storeId = req.params.id
-        await MasterStoreCatalogue.findAll({
+        await MasterStore.findOne({
+            include: MasterStoreCatalogue,
             where: {
-                storeId: storeId,
+                storeCode: req.query.code,
                 status: ACTIVE
             },
         }).then((result) => {
-            return res.status(200).send(result);
+            return res.status(200).send(result.MasterStoreCatalogues);
         }).catch((error) => {
             SequelizeErrorHandling(error, res);
         });
@@ -58,6 +60,22 @@ const InitDataDistributorRoute = (app) => {
     */
     app.get(`/v${process.env.APP_MAJOR_VERSION}/category`, checkAuth, async (req, res) => {
         await MasterCategory.findAll({
+            where: {
+                status: ACTIVE
+            },
+        }).then((result) => {
+            return res.status(200).send(result);
+        }).catch((error) => {
+            SequelizeErrorHandling(error, res);
+        });
+    });
+
+    /*GET Method
+    * ROUTE: /{version}/couriers
+    * This route fetch all the selected app product courier datasets
+    */
+    app.get(`/v${process.env.APP_MAJOR_VERSION}/couriers`, checkAuth, async (req, res) => {
+        await MasterCourier.findAll({
             where: {
                 status: ACTIVE
             },

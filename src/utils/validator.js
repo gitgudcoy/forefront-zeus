@@ -74,30 +74,45 @@ function validateStoreInfo(data) {
 
 // CATALOG VALIDATION
 function validateProductDisplayInfo(data) {
+
     let result = `${data.productName}`.match(NO_EMPTY_3_CHAR_REGEX);
     if (!result) return { result: result, message: INVALID_PRODUCT_NAME };
+
     result = `${data.productCategory}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_CATEGORY };
+    if (data.productCategory === "undefined") return { result: null, message: INVALID_PRODUCT_CATEGORY };
+
     result = `${data.productCatalog}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_CATALOG };
+    if (data.productCatalog === "undefined") return { result: null, message: INVALID_PRODUCT_CATALOG };
+
     result = `${data.productDescription}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_DESCRIPTION };
+
     result = `${data.productHashtag}`.match(NO_EMPTY_3_CHAR_REGEX);
     if (!result) return { result: result, message: INVALID_PRODUCT_HASHTAG };
+
     result = `${data.productCondition}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_CONDITION };
+
     result = `${data.productWeight}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_WEIGHT };
+
     result = `${data.productBidPrice}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_BID_PRICE };
+
     result = `${data.productBINPrice}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_BIN_PRICE };
+
     result = `${data.productBidMultiplication}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_BID_MULTIPLICATION };
+
     result = `${data.productBidMultiplicationPeriod}`.match(NO_EMPTY_3_CHAR_REGEX);
     if (!result) return { result: result, message: INVALID_PRODUCT_BID_MULTIPLICATION_PERIOD };
+
     result = `${data.productBidPeriod}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_BID_PERIOD };
+
     result = `${data.productStocks}`.match(NO_EMPTY_STRING);
     if (!result) return { result: result, message: INVALID_PRODUCT_STOCKS };
     if (data.courierChoosen === 0) return { result: null, message: INVALID_COURIER_CHOOSEN };

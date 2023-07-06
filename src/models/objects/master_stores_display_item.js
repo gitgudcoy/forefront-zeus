@@ -11,11 +11,11 @@ const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
         type: DataTypes.UUID,
         defaultValue: UUIDV4
     },
-    productName: {
+    productCode: {
         allowNull: false,
         type: DataTypes.STRING,
     },
-    productCode: {
+    productName: {
         allowNull: false,
         type: DataTypes.STRING,
     },
