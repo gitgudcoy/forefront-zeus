@@ -17,7 +17,7 @@ const InitDataDistributorRoute = (app) => {
     * It can also call all store 
     * TODO: give limit to the data requested
     */
-    app.get(`/v${process.env.APP_MAJOR_VERSION}/stores`, checkAuth, async (req, res) => {
+    app.get(`/v${process.env.APP_MAJOR_VERSION}/stores`, async (req, res) => {
         // check query param availability
         if (!req.query) return res.status(400).send(UNIDENTIFIED_ERROR);
 
