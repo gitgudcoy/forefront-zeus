@@ -22,7 +22,7 @@ const InitDataDistributorRoute = (app) => {
         if (!req.query) return res.status(400).send(UNIDENTIFIED_ERROR);
 
         // DB request option declaration
-        const storeId = req.query.id;
+        const storeId = req.query.storeId;
         const defaultOptions = {
             status: ACTIVE
         }
