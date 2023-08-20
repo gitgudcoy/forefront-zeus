@@ -1,48 +1,48 @@
-const {
-    DataTypes, UUIDV4,
-} = require('sequelize');
-const { db } = require('../../config');
+const { DataTypes, UUIDV4 } = require("sequelize");
+const { db } = require("../../config");
 
-const MasterFile = db.define("MasterFile", {
+const MasterFile = db.define(
+  "MasterFile",
+  {
     id: {
-        primaryKey: true,
-        allowNull: false,
-        unique: true,
-        type: DataTypes.UUID,
-        defaultValue: UUIDV4
+      primaryKey: true,
+      allowNull: false,
+      unique: true,
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
     },
     filename: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     encoding: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     mimetype: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     fileType: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     destination: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     status: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      unique: false,
+      type: DataTypes.STRING,
     },
-}, {
-    indexes: [
-        { unique: true, fields: ["filename"] },
-    ],
+  },
+  {
+    indexes: [{ unique: true, fields: ["filename"] }],
     paranoid: true,
-    deletedAt: 'destroyTime',
-    tableName: 'master_file'
-});
+    deletedAt: "destroyTime",
+    tableName: "master_file",
+  }
+);
 
-module.exports = { MasterFile }
+module.exports = { MasterFile };

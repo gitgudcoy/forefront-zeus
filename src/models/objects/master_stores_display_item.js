@@ -1,87 +1,87 @@
-const {
-    DataTypes, UUIDV4,
-} = require('sequelize');
-const { db } = require('../../config');
+const { DataTypes, UUIDV4 } = require("sequelize");
+const { db } = require("../../config");
 
-const MasterStoreDisplayItem = db.define("MasterStoreDisplayItem", {
+const MasterStoreDisplayItem = db.define(
+  "MasterStoreDisplayItem",
+  {
     id: {
-        primaryKey: true,
-        allowNull: false,
-        unique: true,
-        type: DataTypes.UUID,
-        defaultValue: UUIDV4
+      primaryKey: true,
+      allowNull: false,
+      unique: true,
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
     },
     productCode: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productName: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productDescription: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productHashtag: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productCondition: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productWeight: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
+      allowNull: false,
+      type: DataTypes.FLOAT,
     },
     productBidPrice: {
-        allowNull: false,
-        type: DataTypes.DECIMAL,
+      allowNull: false,
+      type: DataTypes.DECIMAL,
     },
     productBINPrice: {
-        allowNull: false,
-        type: DataTypes.DECIMAL,
+      allowNull: false,
+      type: DataTypes.DECIMAL,
     },
     productBidMultiplication: {
-        allowNull: false,
-        type: DataTypes.DECIMAL,
+      allowNull: false,
+      type: DataTypes.DECIMAL,
     },
     productBidMultiplicationPeriod: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productBidPeriod: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     productStocks: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
+      allowNull: false,
+      type: DataTypes.INTEGER,
     },
     productRating: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
-        validate: {
-            min: 0,
-            max: 5
-        }
+      allowNull: false,
+      type: DataTypes.FLOAT,
+      validate: {
+        min: 0,
+        max: 5,
+      },
     },
     availableCourierList: {
-        allowNull: false,
-        type: DataTypes.JSON,
+      allowNull: false,
+      type: DataTypes.JSON,
     },
     status: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
-}, {
-    indexes: [
-        { unique: true, fields: ["productCode"] },
-    ],
+  },
+  {
+    indexes: [{ unique: true, fields: ["productCode"] }],
     paranoid: true,
-    deletedAt: 'destroyTime',
-    tableName: 'master_store_display_item'
-});
+    deletedAt: "destroyTime",
+    tableName: "master_store_display_item",
+  }
+);
 
-module.exports = { MasterStoreDisplayItem }
+module.exports = { MasterStoreDisplayItem };

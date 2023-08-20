@@ -1,32 +1,32 @@
-const {
-    DataTypes, UUIDV4,
-} = require('sequelize');
-const { db } = require('../../config');
+const { DataTypes, UUIDV4 } = require("sequelize");
+const { db } = require("../../config");
 
-const MasterCategory = db.define("MasterCategory", {
+const MasterCategory = db.define(
+  "MasterCategory",
+  {
     id: {
-        primaryKey: true,
-        allowNull: false,
-        unique: true,
-        type: DataTypes.UUID,
-        defaultValue: UUIDV4
+      primaryKey: true,
+      allowNull: false,
+      unique: true,
+      type: DataTypes.UUID,
+      defaultValue: UUIDV4,
     },
     categoryName: {
-        allowNull: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      type: DataTypes.STRING,
     },
     status: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.STRING,
+      allowNull: false,
+      unique: false,
+      type: DataTypes.STRING,
     },
-}, {
-    indexes: [
-        { unique: true, fields: ["categoryName"] },
-    ],
+  },
+  {
+    indexes: [{ unique: true, fields: ["categoryName"] }],
     paranoid: true,
-    deletedAt: 'destroyTime',
-    tableName: 'master_category'
-});
+    deletedAt: "destroyTime",
+    tableName: "master_category",
+  }
+);
 
-module.exports = { MasterCategory }
+module.exports = { MasterCategory };
