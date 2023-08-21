@@ -17,6 +17,7 @@ function handleCSRFToken(req, res, next) {
 
 async function checkAuth(req, res, next) {
   // Check the user session
+  console.log(JSON.stringify(req.headers));
   console.log(req.headers[X_SID]);
   if (!req.headers[X_SID])
     return res.status(401).send(SESSION_TOKEN_NOT_FOUND);
