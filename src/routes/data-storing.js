@@ -39,7 +39,7 @@ const {
 } = require("../variables/responseMessage");
 const multer = require("multer");
 const productUpload = multer({
-  dest: "tmp/uploads/product-files",
+  dest: "tmp",
 });
 
 const InitDataStoringRoute = (app) => {
