@@ -20,7 +20,7 @@ const POST_SEND_PROFILEPIC = "POST_SEND_PROFILEPIC";
 const POST_ADD_CATALOGUE = "POST_ADD_KATEGORI";
 
 // HEADER NAME
-export const X_SID = "X-SID";
+const X_SID = "X-SID";
 
 // EMAIL TYPE
 const SEND_OTP = "SEND_OTP";
@@ -55,6 +55,7 @@ module.exports = {
   PRODUCT_CATALOGUE_ADDITIONAL_FILES,
   USER,
   SUCCESS,
+  X_SID,
   STR,
   PRD,
   CLOG,
