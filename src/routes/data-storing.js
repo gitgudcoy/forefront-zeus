@@ -80,7 +80,6 @@ const InitDataStoringRoute = (app) => {
           where: {
             storeName: storeInfo.storeName,
           },
-          transaction: trx,
         });
 
         // generate new code and create the store with the provided data
