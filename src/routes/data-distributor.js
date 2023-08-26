@@ -53,6 +53,8 @@ const InitDataDistributorRoute = (app) => {
       })
         .then((result) => {
           result = storeId ? result[0] : result;
+          if (storeId && !result)
+            return res.status(204).send(result);
           return res.status(200).send(result);
         })
         .catch((error) => {

@@ -114,6 +114,7 @@ const InitDataStoringRoute = (app) => {
         } else
           return res.status(409).send(STORE_ALREADY_EXIST);
       } catch (error) {
+        // TODO: create retry function for an unknown sudden rollback
         await SequelizeRollback(trx, error);
         SequelizeErrorHandling(error, res);
       }
