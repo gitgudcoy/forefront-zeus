@@ -84,30 +84,39 @@ const InitDataStoringRoute = (app) => {
 
         // generate new code and create the store with the provided data
         const newStoreCode = generateCode(8, req.user, STR);
+        const inserting = {
+          storeName: storeInfo.storeName,
+          storeDescription: storeInfo.storeDescription,
+          storeCode: newStoreCode,
+          storeLevel: 1,
+          storeQualityRating: 0,
+          storeSpeedRating: 0,
+          storeServiceRating: 0,
+          storePhone: storeInfo.storePhone,
+          storeWhatsapp: storeInfo.storeWhatsapp,
+          storeEmail: storeInfo.storeEmail,
+          storeProvince: storeInfo.storeProvince,
+          storeRegency: storeInfo.storeRegency,
+          storeDistrict: storeInfo.storeDistrict,
+          storeVillage: storeInfo.storeVillage,
+          storeAddress: storeInfo.storeAddress,
+          storePostalCode: storeInfo.storePostalCode,
+          userId: storeInfo.userId,
+          status: ACTIVE,
+          MasterStoreDetails: {
+            status: ACTIVE,
+          },
+        };
         if (!existing) {
-          await MasterStore.create(
-            {
-              storeName: storeInfo.storeName,
-              storeDescription: storeInfo.storeDescription,
-              storeCode: newStoreCode,
-              storeLevel: 1,
-              storeQualityRating: 0,
-              storeSpeedRating: 0,
-              storeServiceRating: 0,
-              storePhone: storeInfo.storePhone,
-              storeWhatsapp: storeInfo.storeWhatsapp,
-              storeEmail: storeInfo.storeEmail,
-              storeProvince: storeInfo.storeProvince,
-              storeRegency: storeInfo.storeRegency,
-              storeDistrict: storeInfo.storeDistrict,
-              storeVillage: storeInfo.storeVillage,
-              storeAddress: storeInfo.storeAddress,
-              storePostalCode: storeInfo.storePostalCode,
-              userId: storeInfo.userId,
-              status: ACTIVE,
-            },
-            { transaction: trx }
-          );
+          await MasterStore.create(inserting, {
+            transaction: trx,
+            include: [
+              {
+                model: db.MasterStoreDetails,
+                as: "MasterStoreDetails",
+              },
+            ],
+          });
           // commit transaction
           await trx.commit();
           return res.sendStatus(200);
