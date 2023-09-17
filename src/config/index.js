@@ -59,15 +59,11 @@ const AppConfig = (app, express) => {
       store: sequelizeSessionStore,
     })
   );
-  // const csrfProtection = csrf({
-  //     cookie: false,
-  // });
 
   // Global Middleware
   app.use((err, req, res, next) => {
     res.status(500).send("Something went wrong!");
   });
-  // app.use(csrfProtection);
 
   return app;
 };

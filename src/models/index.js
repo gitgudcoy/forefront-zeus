@@ -10,7 +10,6 @@ const {
 const {
   MasterCategory,
 } = require("./objects/master_category");
-const { MasterFile } = require("./objects/master_file");
 const {
   MasterStoreChannels,
 } = require("./objects/master_stores_channels");
@@ -102,24 +101,6 @@ const InitModels = async () => {
     foreignKey: {
       name: "storeId",
       allowNull: false,
-    },
-    sourceKey: "id",
-    constraints: false,
-  });
-
-  // MasterFile - MasterStoreDisplayItem ASSOCIATION
-  MasterFile.belongsTo(MasterStoreDisplayItem, {
-    foreignKey: {
-      name: "displayItemId",
-      allowNull: true,
-    },
-    targetKey: "id",
-    constraints: false,
-  });
-  MasterStoreDisplayItem.hasMany(MasterFile, {
-    foreignKey: {
-      name: "displayItemId",
-      allowNull: true,
     },
     sourceKey: "id",
     constraints: false,

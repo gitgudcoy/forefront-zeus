@@ -1,10 +1,4 @@
-const {
-  POSTRequest,
-} = require("../../../forefront-olympus/src/utils/axios/post");
 const { db } = require("../config");
-const {
-  MasterFile,
-} = require("../models/objects/master_file");
 const {
   MasterStore,
 } = require("../models/objects/master_stores");
@@ -17,6 +11,7 @@ const {
 const {
   MasterStoreDisplayItem,
 } = require("../models/objects/master_stores_display_item");
+const { POSTRequest } = require("../utils/axios/post");
 const { generateCode } = require("../utils/formater");
 const {
   SequelizeRollback,
@@ -39,6 +34,11 @@ const {
   UPLOADED_ADDITIONAL_FILES,
   UPLOADED_STORE_PROFILE_PICTURE,
   PROFILE_PICTURE,
+  POST_UPLOAD_FILES,
+  UPLOAD_FILES,
+  AUTHORIZATION,
+  X_SID,
+  CONTENT_TYPE,
 } = require("../variables/general");
 const {
   initialStoreChannelsValue,
@@ -58,7 +58,7 @@ const InitDataStoringRoute = (app) => {
   app.post(
     `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores/add`,
     checkAuth,
-    multerInstance.array(UPLOADED_STORE_PROFILE_PICTURE, 1),
+    multerInstance.single(UPLOADED_STORE_PROFILE_PICTURE),
     async (req, res) => {
       // check query param availability
       if (!req.body)
@@ -127,7 +127,7 @@ const InitDataStoringRoute = (app) => {
           MasterStoreChannels: newChannels,
         };
 
-        await MasterStore.create(inserting, {
+        const store = await MasterStore.create(inserting, {
           transaction: trx,
           include: [
             {
@@ -138,31 +138,33 @@ const InitDataStoringRoute = (app) => {
         });
 
         // uploaded store profile picture
-        let uploadedStoreProfilePicture = req.files[
-          UPLOADED_STORE_PROFILE_PICTURE
-        ].map((obj) => {
-          return createMasterFile(
-            obj,
-            PROFILE_PICTURE,
-            `${obj.destination}/${obj.filename}`,
-            {
-              displayItemId: displayItem.id,
-            }
-          );
-        });
+        const uploadedStoreProfilePicture =
+          createMasterFile(req.file, PROFILE_PICTURE, {
+            displayItemId: null,
+            storeId: store.id,
+          });
+
+        const formData = new FormData();
+        formData.append(
+          "files",
+          JSON.stringify([uploadedStoreProfilePicture])
+        );
 
         // TODO: store file in FS
         // send a post request to the chronos API to store the file in its file system
         const result = await POSTRequest({
-          endpoint: process.env.APP_MAILER_HOST_PORT,
-          url: SEND_MAIL,
-          data: {
-            receiver: user.email,
-            subject: OTP_EMAIL,
-            mailType: SEND_OTP,
-            props: userInfo,
+          endpoint: process.env.APP_CHRONOS_HOST_PORT,
+          headers: {
+            [AUTHORIZATION]: `Bearer ${
+              req.headers[AUTHORIZATION] &&
+              req.headers[AUTHORIZATION].split(" ")[1]
+            }`,
+            [X_SID]: req.headers[X_SID],
+            [CONTENT_TYPE]: "multipart/form-data",
           },
-          logTitle: POST_SEND_EMAIL,
+          url: UPLOAD_FILES,
+          data: formData,
+          logTitle: POST_UPLOAD_FILES,
         });
 
         if (!result)
@@ -175,12 +177,6 @@ const InitDataStoringRoute = (app) => {
           return res
             .status(result.httpCode)
             .send(result.errContent);
-
-        // bulk create the files that has been concat
-        await MasterFile.bulkCreate(
-          uploadedStoreProfilePicture,
-          { transaction: trx }
-        );
 
         // commit transaction
         await trx.commit();
@@ -327,21 +323,6 @@ const InitDataStoringRoute = (app) => {
         );
 
         // TODO: store file in FS
-
-        // bulk create the files that has been concat
-        await MasterFile.bulkCreate(
-          fileConcat.map((obj) => {
-            return createMasterFile(
-              obj,
-              obj.fileType,
-              obj.destination,
-              {
-                displayItemId: obj.displayItemId,
-              }
-            );
-          }),
-          { transaction: trx }
-        );
 
         // commit all the transaction that has been made until now
         await trx.commit();

@@ -45,19 +45,16 @@ function SequelizeErrorHandling(err, res) {
   } else return res.status(400).send(err.toString());
 }
 
-function createMasterFile(
-  file,
-  fileType,
-  destination,
-  ids
-) {
+function createMasterFile(file, fileType, ids) {
   return {
-    filename: file.filename,
+    filename: file.originalname,
     encoding: file.encoding,
     mimetype: file.mimetype,
+    buffer: file.buffer,
+    size: file.size,
     fileType: fileType,
-    destination: destination,
     displayItemId: ids.displayItemId,
+    storeId: ids.storeId,
     status: ACTIVE,
   };
 }
