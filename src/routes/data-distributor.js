@@ -103,6 +103,7 @@ const InitDataDistributorRoute = (app) => {
             [Op.or]: mappedStoreId,
             status: ACTIVE,
           },
+          include: MasterStoreEmployees,
         });
         return res.status(200).send(result);
       } catch (error) {
