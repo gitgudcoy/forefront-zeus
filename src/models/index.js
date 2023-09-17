@@ -13,6 +13,9 @@ const {
 const {
   MasterStoreChannels,
 } = require("./objects/master_stores_channels");
+const {
+  MasterStoreEmployees,
+} = require("./objects/master_stores_employees");
 
 const InitModels = async () => {
   // START ASSOCIATING
@@ -28,6 +31,40 @@ const InitModels = async () => {
   MasterStore.belongsTo(MasterUser, {
     foreignKey: {
       name: "userId",
+      allowNull: false,
+    },
+    targetKey: "id",
+    constraints: false,
+  });
+
+  // MasterStoreEmployee - MasterStore - MasterUser ASSOCIATION
+  MasterUser.hasMany(MasterStoreEmployees, {
+    foreignKey: {
+      name: "userId",
+      allowNull: false,
+    },
+    sourceKey: "id",
+    constraints: false,
+  });
+  MasterStoreEmployees.belongsTo(MasterUser, {
+    foreignKey: {
+      name: "userId",
+      allowNull: false,
+    },
+    targetKey: "id",
+    constraints: false,
+  });
+  MasterStore.hasMany(MasterStoreEmployees, {
+    foreignKey: {
+      name: "storeId",
+      allowNull: false,
+    },
+    sourceKey: "id",
+    constraints: false,
+  });
+  MasterStoreEmployees.belongsTo(MasterStore, {
+    foreignKey: {
+      name: "storeId",
       allowNull: false,
     },
     targetKey: "id",
@@ -88,7 +125,7 @@ const InitModels = async () => {
     constraints: false,
   });
 
-  // MasterStore - MasterStoreDetail ASSOCIATION
+  // MasterStore - MasterStoreChannels ASSOCIATION
   MasterStoreChannels.belongsTo(MasterStore, {
     foreignKey: {
       name: "storeId",

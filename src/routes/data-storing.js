@@ -11,6 +11,9 @@ const {
 const {
   MasterStoreDisplayItem,
 } = require("../models/objects/master_stores_display_item");
+const {
+  MasterStoreEmployees,
+} = require("../models/objects/master_stores_employees");
 const { POSTRequest } = require("../utils/axios/post");
 const { generateCode } = require("../utils/formater");
 const {
@@ -33,12 +36,14 @@ const {
   UPLOADED_IMAGE_FILES,
   UPLOADED_ADDITIONAL_FILES,
   UPLOADED_STORE_PROFILE_PICTURE,
-  PROFILE_PICTURE,
+  STORE_PROFILE_PICTURE,
   POST_UPLOAD_FILES,
   UPLOAD_FILES,
   AUTHORIZATION,
   X_SID,
   CONTENT_TYPE,
+  LEVEL_1,
+  EMPLOYEE,
 } = require("../variables/general");
 const {
   initialStoreChannelsValue,
@@ -48,7 +53,9 @@ const {
   STORE_ALREADY_EXIST,
   INTERNAL_ERROR_CANT_COMMUNICATE,
 } = require("../variables/responseMessage");
-const multerInstance = require("multer")();
+const multerInstance = require("multer")({
+  limits: { fieldSize: 25 * 1024 * 1024 },
+});
 
 const InitDataStoringRoute = (app) => {
   // POST Method
@@ -96,6 +103,8 @@ const InitDataStoringRoute = (app) => {
 
         // generate new code and create the store with the provided data
         const newStoreCode = generateCode(8, req.user, STR);
+
+        // create creative store channels
         const newChannels = Object.entries(
           initialStoreChannelsValue()
         ).map(([key, val], index) => {
@@ -105,6 +114,15 @@ const InitDataStoringRoute = (app) => {
             status: ACTIVE,
           };
         });
+
+        // create store owner relationship
+        const owner = {
+          userId: req.user.userId,
+          employeeRoles: `[${EMPLOYEE}, ${LEVEL_1}]`,
+          status: ACTIVE,
+        };
+
+        // create the store payload
         const inserting = {
           storeName: storeInfo.storeName,
           storeDescription: storeInfo.storeDescription,
@@ -125,6 +143,7 @@ const InitDataStoringRoute = (app) => {
           userId: storeInfo.userId,
           status: ACTIVE,
           MasterStoreChannels: newChannels,
+          MasterStoreEmployees: owner,
         };
 
         const store = await MasterStore.create(inserting, {
@@ -134,15 +153,23 @@ const InitDataStoringRoute = (app) => {
               model: MasterStoreChannels,
               as: "MasterStoreChannels",
             },
+            {
+              model: MasterStoreEmployees,
+              as: "MasterStoreEmployees",
+            },
           ],
         });
 
         // uploaded store profile picture
         const uploadedStoreProfilePicture =
-          createMasterFile(req.file, PROFILE_PICTURE, {
-            displayItemId: null,
-            storeId: store.id,
-          });
+          createMasterFile(
+            req.file,
+            STORE_PROFILE_PICTURE,
+            {
+              displayItemId: null,
+              storeId: store.id,
+            }
+          );
 
         const formData = new FormData();
         formData.append(

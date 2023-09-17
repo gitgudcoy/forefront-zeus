@@ -19,13 +19,15 @@ async function SequelizeRollback(trx, error) {
 function SequelizeErrorHandling(err, res) {
   var errMessages = [];
   // if the DB error is database error
-  if (err.name === SEQUELIZE_DATABASE_ERROR)
+  if (err.name === SEQUELIZE_DATABASE_ERROR) {
+    console.log(err);
     return res.status(500).send({
       code: err.parent.code,
       parentMessage: err.parent.sqlMessage,
       original: err.original.code,
       originalMessage: err.original.sqlMessage,
     });
+  }
   // if the DB error is the user input error
   if (err.name === SEQUELIZE_VALIDATION_ERROR) {
     err.errors.forEach((err) =>

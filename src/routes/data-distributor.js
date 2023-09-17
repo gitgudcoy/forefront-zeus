@@ -21,6 +21,10 @@ const {
 const {
   MasterStoreChannels,
 } = require("../models/objects/master_stores_channels");
+const {
+  MasterStoreEmployees,
+} = require("../models/objects/master_stores_employees");
+const { Op } = require("sequelize");
 
 const InitDataDistributorRoute = (app) => {
   /*GET Method
@@ -69,6 +73,9 @@ const InitDataDistributorRoute = (app) => {
    * ROUTE: /{version}/user/:id/stores
    * This route fetch all the user stores datasets
    */
+  //TODO: We gonna use master_store_employees role later
+  // and will make the system search by employee first and then the store detail
+  // just add more field to the where query with storeId: a [OR] b [OR] ... using sequelize operator
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores`,
     checkAuth,
@@ -78,18 +85,32 @@ const InitDataDistributorRoute = (app) => {
         return res.status(400).send(UNIDENTIFIED_ERROR);
       // Get the request body
       const userId = req.params.id;
-      await MasterStore.findAll({
-        where: {
-          userId: userId,
-          status: ACTIVE,
-        },
-      })
-        .then((result) => {
-          return res.status(200).send(result);
-        })
-        .catch((error) => {
-          SequelizeErrorHandling(error, res);
+      // use try catch for error handling
+      try {
+        const employeeStoreRelations =
+          await MasterStoreEmployees.findAll({
+            where: {
+              userId: userId,
+              status: ACTIVE,
+            },
+          });
+
+        const mappedStoreId = employeeStoreRelations.map(
+          (value) => {
+            return { id: value.storeId };
+          }
+        );
+
+        const result = await MasterStore.findAll({
+          where: {
+            [Op.or]: mappedStoreId,
+            status: ACTIVE,
+          },
         });
+        return res.status(200).send(result);
+      } catch (error) {
+        SequelizeErrorHandling(error, res);
+      }
     }
   );
 
