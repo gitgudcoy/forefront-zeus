@@ -73,9 +73,6 @@ const InitDataDistributorRoute = (app) => {
    * ROUTE: /{version}/user/:id/stores
    * This route fetch all the user stores datasets
    */
-  //TODO: We gonna use master_store_employees role later
-  // and will make the system search by employee first and then the store detail
-  // just add more field to the where query with storeId: a [OR] b [OR] ... using sequelize operator
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores`,
     checkAuth,
