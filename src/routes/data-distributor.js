@@ -1,5 +1,3 @@
-const { Op } = require("sequelize");
-const { db } = require("../config");
 const {
   MasterStore,
 } = require("../models/objects/master_stores");
@@ -20,6 +18,9 @@ const { ACTIVE } = require("../variables/general");
 const {
   MasterCourier,
 } = require("../models/objects/master_courier");
+const {
+  MasterStoreChannels,
+} = require("../models/objects/master_stores_channels");
 
 const InitDataDistributorRoute = (app) => {
   /*GET Method
@@ -50,6 +51,7 @@ const InitDataDistributorRoute = (app) => {
       // DB request execution
       await MasterStore.findAll({
         where: options,
+        include: MasterStoreChannels,
       })
         .then((result) => {
           result = storeId ? result[0] : result;

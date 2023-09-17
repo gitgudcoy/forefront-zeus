@@ -1,7 +1,7 @@
-const { db } = require("../config");
 const {
-  MasterCategory,
-} = require("../models/objects/master_category");
+  POSTRequest,
+} = require("../../../forefront-olympus/src/utils/axios/post");
+const { db } = require("../config");
 const {
   MasterFile,
 } = require("../models/objects/master_file");
@@ -11,6 +11,9 @@ const {
 const {
   MasterStoreCatalogue,
 } = require("../models/objects/master_stores_catalogue");
+const {
+  MasterStoreChannels,
+} = require("../models/objects/master_stores_channels");
 const {
   MasterStoreDisplayItem,
 } = require("../models/objects/master_stores_display_item");
@@ -32,15 +35,20 @@ const {
   CLOG,
   PRODUCT_CATALOGUE_IMAGE,
   PRODUCT_CATALOGUE_ADDITIONAL_FILES,
+  UPLOADED_IMAGE_FILES,
+  UPLOADED_ADDITIONAL_FILES,
+  UPLOADED_STORE_PROFILE_PICTURE,
+  PROFILE_PICTURE,
 } = require("../variables/general");
+const {
+  initialStoreChannelsValue,
+} = require("../variables/initialValues");
 const {
   UNIDENTIFIED_ERROR,
   STORE_ALREADY_EXIST,
+  INTERNAL_ERROR_CANT_COMMUNICATE,
 } = require("../variables/responseMessage");
-const multer = require("multer");
-const productUpload = multer({
-  dest: "tmp",
-});
+const multerInstance = require("multer")();
 
 const InitDataStoringRoute = (app) => {
   // POST Method
@@ -50,6 +58,7 @@ const InitDataStoringRoute = (app) => {
   app.post(
     `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores/add`,
     checkAuth,
+    multerInstance.array(UPLOADED_STORE_PROFILE_PICTURE, 1),
     async (req, res) => {
       // check query param availability
       if (!req.body)
@@ -82,8 +91,20 @@ const InitDataStoringRoute = (app) => {
           },
         });
 
+        if (existing)
+          return res.status(409).send(STORE_ALREADY_EXIST);
+
         // generate new code and create the store with the provided data
         const newStoreCode = generateCode(8, req.user, STR);
+        const newChannels = Object.entries(
+          initialStoreChannelsValue()
+        ).map(([key, val], index) => {
+          return {
+            channelsOrder: index + 1,
+            channelsJSON: { [key]: val },
+            status: ACTIVE,
+          };
+        });
         const inserting = {
           storeName: storeInfo.storeName,
           storeDescription: storeInfo.storeDescription,
@@ -103,25 +124,67 @@ const InitDataStoringRoute = (app) => {
           storePostalCode: storeInfo.storePostalCode,
           userId: storeInfo.userId,
           status: ACTIVE,
-          MasterStoreDetails: {
-            status: ACTIVE,
-          },
+          MasterStoreChannels: newChannels,
         };
-        if (!existing) {
-          await MasterStore.create(inserting, {
-            transaction: trx,
-            include: [
-              {
-                model: db.MasterStoreDetails,
-                as: "MasterStoreDetails",
-              },
-            ],
-          });
-          // commit transaction
-          await trx.commit();
-          return res.sendStatus(200);
-        } else
-          return res.status(409).send(STORE_ALREADY_EXIST);
+
+        await MasterStore.create(inserting, {
+          transaction: trx,
+          include: [
+            {
+              model: MasterStoreChannels,
+              as: "MasterStoreChannels",
+            },
+          ],
+        });
+
+        // uploaded store profile picture
+        let uploadedStoreProfilePicture = req.files[
+          UPLOADED_STORE_PROFILE_PICTURE
+        ].map((obj) => {
+          return createMasterFile(
+            obj,
+            PROFILE_PICTURE,
+            `${obj.destination}/${obj.filename}`,
+            {
+              displayItemId: displayItem.id,
+            }
+          );
+        });
+
+        // TODO: store file in FS
+        // send a post request to the chronos API to store the file in its file system
+        const result = await POSTRequest({
+          endpoint: process.env.APP_MAILER_HOST_PORT,
+          url: SEND_MAIL,
+          data: {
+            receiver: user.email,
+            subject: OTP_EMAIL,
+            mailType: SEND_OTP,
+            props: userInfo,
+          },
+          logTitle: POST_SEND_EMAIL,
+        });
+
+        if (!result)
+          return res.status(404).send(UNIDENTIFIED_ERROR);
+        if (result.httpCode === 500)
+          return res
+            .status(500)
+            .send(INTERNAL_ERROR_CANT_COMMUNICATE);
+        if (result.error)
+          return res
+            .status(result.httpCode)
+            .send(result.errContent);
+
+        // bulk create the files that has been concat
+        await MasterFile.bulkCreate(
+          uploadedStoreProfilePicture,
+          { transaction: trx }
+        );
+
+        // commit transaction
+        await trx.commit();
+        return res.sendStatus(200);
       } catch (error) {
         // TODO: create retry function for an unknown sudden rollback
         await SequelizeRollback(trx, error);
@@ -136,9 +199,9 @@ const InitDataStoringRoute = (app) => {
   app.post(
     `/v${process.env.APP_MAJOR_VERSION}/store/catalogues/add`,
     checkAuth,
-    productUpload.fields([
-      { name: "uploadedImageFiles", maxCount: 5 },
-      { name: "uploadedAdditionalFiles", maxCount: 5 },
+    multerInstance.fields([
+      { name: UPLOADED_IMAGE_FILES, maxCount: 5 },
+      { name: UPLOADED_ADDITIONAL_FILES, maxCount: 5 },
     ]),
     async (req, res) => {
       // check query param availability
@@ -232,42 +295,38 @@ const InitDataStoringRoute = (app) => {
         // insert uploaded image
         // uploaded image files
         let uploadedImageFiles = req.files[
-          "uploadedImageFiles"
-        ]
-          ? req.files["uploadedImageFiles"]
-          : [];
+          UPLOADED_IMAGE_FILES
+        ].map((obj) => {
+          return createMasterFile(
+            obj,
+            PRODUCT_CATALOGUE_IMAGE,
+            `${obj.destination}/${obj.filename}`,
+            {
+              displayItemId: displayItem.id,
+            }
+          );
+        });
 
         // additional uploaded image files
         let uploadedAdditionalFiles = req.files[
-          "uploadedAdditionalFiles"
-        ]
-          ? req.files["uploadedAdditionalFiles"]
-          : [];
+          UPLOADED_ADDITIONAL_FILES
+        ].map((obj) => {
+          return createMasterFile(
+            obj,
+            PRODUCT_CATALOGUE_ADDITIONAL_FILES,
+            `${obj.destination}/${obj.filename}`,
+            {
+              displayItemId: displayItem.id,
+            }
+          );
+        });
 
         // concat between uploaded files and additional uploaded files
-        const fileConcat = uploadedImageFiles
-          .map((obj) => {
-            return createMasterFile(
-              obj,
-              PRODUCT_CATALOGUE_IMAGE,
-              `${obj.destination}/${obj.filename}`,
-              {
-                displayItemId: displayItem.id,
-              }
-            );
-          })
-          .concat(
-            uploadedAdditionalFiles.map((obj) => {
-              return createMasterFile(
-                obj,
-                PRODUCT_CATALOGUE_ADDITIONAL_FILES,
-                `${obj.destination}/${obj.filename}`,
-                {
-                  displayItemId: displayItem.id,
-                }
-              );
-            })
-          );
+        const fileConcat = uploadedImageFiles.concat(
+          uploadedAdditionalFiles
+        );
+
+        // TODO: store file in FS
 
         // bulk create the files that has been concat
         await MasterFile.bulkCreate(

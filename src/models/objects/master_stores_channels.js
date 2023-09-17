@@ -3,9 +3,10 @@ const { db } = require("../../config");
 const {
   initialStoreChannelsValue,
 } = require("../../variables/initialValues");
+const { USER } = require("../../variables/general");
 
-const MasterStoreDetails = db.define(
-  "MasterStoreDetails",
+const MasterStoreChannels = db.define(
+  "MasterStoreChannels",
   {
     id: {
       primaryKey: true,
@@ -14,24 +15,22 @@ const MasterStoreDetails = db.define(
       type: DataTypes.UUID,
       defaultValue: UUIDV4,
     },
-    generalSettingsJSON: {
+    settingsJSON: {
       allowNull: true,
       type: DataTypes.JSON,
     },
-    videoSettingsJSON: {
-      allowNull: true,
+    allowedRoles: {
+      allowNull: false,
       type: DataTypes.JSON,
+      defaultValue: `[${USER}]`,
     },
-    audioSettingsJSON: {
+    channelsOrder: {
       allowNull: true,
-      type: DataTypes.JSON,
+      type: DataTypes.INTEGER,
     },
     channelsJSON: {
       allowNull: true,
       type: DataTypes.JSON,
-      defaultValue: () => {
-        return JSON.stringify(initialStoreChannelsValue());
-      },
     },
     status: {
       allowNull: false,
@@ -42,8 +41,8 @@ const MasterStoreDetails = db.define(
   {
     paranoid: true,
     deletedAt: "destroyTime",
-    tableName: "master_store_details",
+    tableName: "master_store_channels",
   }
 );
 
-module.exports = { MasterStoreDetails };
+module.exports = { MasterStoreChannels };
