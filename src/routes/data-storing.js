@@ -148,6 +148,7 @@ const InitDataStoringRoute = (app) => {
 
         const store = await MasterStore.create(inserting, {
           transaction: trx,
+          lock: true,
           include: [
             {
               model: MasterStoreChannels,
@@ -159,6 +160,13 @@ const InitDataStoringRoute = (app) => {
             },
           ],
         });
+
+        // if profile picture file doesn't exist, just commit
+        if (!req.file) {
+          // commit transaction
+          await trx.commit();
+          return res.sendStatus(200);
+        }
 
         // uploaded store profile picture
         const uploadedStoreProfilePicture =
@@ -199,7 +207,11 @@ const InitDataStoringRoute = (app) => {
         if (result.httpCode === 500)
           return res
             .status(500)
-            .send(INTERNAL_ERROR_CANT_COMMUNICATE);
+            .send(
+              result.errContent
+                ? result.errContent
+                : INTERNAL_ERROR_CANT_COMMUNICATE
+            );
         if (result.error)
           return res
             .status(result.httpCode)
@@ -275,6 +287,7 @@ const InitDataStoringRoute = (app) => {
             {
               ignoreDuplicates: true,
               transaction: trx,
+              lock: true,
             }
           );
 
@@ -312,7 +325,7 @@ const InitDataStoringRoute = (app) => {
                   productInfo.productCatalog
               ).id,
             },
-            { transaction: trx }
+            { transaction: trx, lock: true }
           );
 
         // insert uploaded image
