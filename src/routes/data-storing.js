@@ -174,7 +174,6 @@ const InitDataStoringRoute = (app) => {
             req.file,
             STORE_PROFILE_PICTURE,
             {
-              displayItemId: null,
               storeId: store.id,
             }
           );
@@ -185,7 +184,6 @@ const InitDataStoringRoute = (app) => {
           JSON.stringify([uploadedStoreProfilePicture])
         );
 
-        // TODO: store file in FS
         // send a post request to the chronos API to store the file in its file system
         const result = await POSTRequest({
           endpoint: process.env.APP_CHRONOS_HOST_PORT,
@@ -256,6 +254,7 @@ const InitDataStoringRoute = (app) => {
 
       // Get the request body
       const productInfo = req.body;
+      console.log(productInfo.productWeightUnit);
       const trx = await db.transaction();
       try {
         // find the store for the whole transaction identity
@@ -303,15 +302,12 @@ const InitDataStoringRoute = (app) => {
               productCondition:
                 productInfo.productCondition,
               productWeight: productInfo.productWeight,
-              productBidPrice: productInfo.productBidPrice,
-              productBINPrice: productInfo.productBINPrice,
-              productBidMultiplication:
-                productInfo.productBidMultiplication,
-              productBidMultiplicationPeriod:
-                productInfo.productBidMultiplicationPeriod,
-              productBidPeriod:
-                productInfo.productBidPeriod,
+              productWeightUnit:
+                productInfo.productWeightUnit,
+              productPrice: productInfo.productPrice,
               productStocks: productInfo.productStocks,
+              productSafetyStocks:
+                productInfo.productSafetyStocks,
               productRating: 0,
               availableCourierList:
                 productInfo.courierChoosen,
@@ -336,7 +332,6 @@ const InitDataStoringRoute = (app) => {
           return createMasterFile(
             obj,
             PRODUCT_CATALOGUE_IMAGE,
-            `${obj.destination}/${obj.filename}`,
             {
               displayItemId: displayItem.id,
             }
@@ -350,7 +345,6 @@ const InitDataStoringRoute = (app) => {
           return createMasterFile(
             obj,
             PRODUCT_CATALOGUE_ADDITIONAL_FILES,
-            `${obj.destination}/${obj.filename}`,
             {
               displayItemId: displayItem.id,
             }
@@ -362,7 +356,42 @@ const InitDataStoringRoute = (app) => {
           uploadedAdditionalFiles
         );
 
-        // TODO: store file in FS
+        const formData = new FormData();
+        formData.append(
+          "files",
+          JSON.stringify(fileConcat)
+        );
+
+        // send a post request to the chronos API to store the file in its file system
+        const result = await POSTRequest({
+          endpoint: process.env.APP_CHRONOS_HOST_PORT,
+          headers: {
+            [AUTHORIZATION]: `Bearer ${
+              req.headers[AUTHORIZATION] &&
+              req.headers[AUTHORIZATION].split(" ")[1]
+            }`,
+            [X_SID]: req.headers[X_SID],
+            [CONTENT_TYPE]: "multipart/form-data",
+          },
+          url: UPLOAD_FILES,
+          data: formData,
+          logTitle: POST_UPLOAD_FILES,
+        });
+
+        if (!result)
+          return res.status(404).send(UNIDENTIFIED_ERROR);
+        if (result.httpCode === 500)
+          return res
+            .status(500)
+            .send(
+              result.errContent
+                ? result.errContent
+                : INTERNAL_ERROR_CANT_COMMUNICATE
+            );
+        if (result.error)
+          return res
+            .status(result.httpCode)
+            .send(result.errContent);
 
         // commit all the transaction that has been made until now
         await trx.commit();

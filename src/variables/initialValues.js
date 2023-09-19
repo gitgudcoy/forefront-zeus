@@ -1,4 +1,59 @@
 const { v4 } = require("uuid");
+const { ACTIVE } = require("./general");
+
+const initialMasterCourierValue = [
+  {
+    courierName: "GOJEK",
+    status: ACTIVE,
+  },
+  {
+    courierName: "JNT",
+    status: ACTIVE,
+  },
+  {
+    courierName: "GRAB",
+    status: ACTIVE,
+  },
+  {
+    courierName: "EKSPEDISI LAINNYA",
+    status: ACTIVE,
+  },
+];
+
+const initialMasterCategoryValue = [
+  {
+    categoryName: "Pakaian",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Otomotif",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Peralatan Dapur",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Furnitur",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Aksesoris",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Hardware",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Aksesoris HP",
+    status: ACTIVE,
+  },
+  {
+    categoryName: "Lain - Lain",
+    status: ACTIVE,
+  },
+];
 
 const initialStoreChannelsValue = () => {
   // generate channel ids
@@ -61,5 +116,7 @@ const initialStoreChannelsValue = () => {
 };
 
 module.exports = {
+  initialMasterCourierValue,
+  initialMasterCategoryValue,
   initialStoreChannelsValue,
 };

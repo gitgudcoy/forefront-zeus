@@ -53,19 +53,15 @@ const INVALID_PRODUCT_HASHTAG =
 const INVALID_PRODUCT_CONDITION =
   "Mohon input kondisi produk dengan benar";
 const INVALID_PRODUCT_WEIGHT =
-  "Mohon input berat produk benar";
-const INVALID_PRODUCT_BID_PRICE =
-  "Mohon input harga lelang dengan benar";
-const INVALID_PRODUCT_BIN_PRICE =
-  "Mohon input harga buy it now dengan benar";
-const INVALID_PRODUCT_BID_MULTIPLICATION =
-  "Mohon harga kelipatan lelang dengan benar";
-const INVALID_PRODUCT_BID_MULTIPLICATION_PERIOD =
-  "Mohon input periode kelipatan lelang dengan benar";
-const INVALID_PRODUCT_BID_PERIOD =
-  "Mohon input periode lelang dengan benar";
+  "Mohon input berat produk dengan benar";
+const INVALID_PRODUCT_WEIGHT_UNIT =
+  "Mohon input satuan berat produk dengan benar";
+const INVALID_PRODUCT_PRICE =
+  "Mohon input harga produk dengan benar";
 const INVALID_PRODUCT_STOCKS =
   "Mohon input jumlah stok dengan benar";
+const INVALID_PRODUCT_SAFETY_STOCKS =
+  "Mohon input jumlah safety stok dengan benar";
 const INVALID_COURIER_CHOOSEN =
   "Mohon input kurir yang dapat digunakan untuk penjemputan dengan benar";
 
@@ -95,11 +91,9 @@ module.exports = {
   INVALID_PRODUCT_HASHTAG,
   INVALID_PRODUCT_CONDITION,
   INVALID_PRODUCT_WEIGHT,
-  INVALID_PRODUCT_BID_PRICE,
-  INVALID_PRODUCT_BIN_PRICE,
-  INVALID_PRODUCT_BID_MULTIPLICATION,
-  INVALID_PRODUCT_BID_MULTIPLICATION_PERIOD,
-  INVALID_PRODUCT_BID_PERIOD,
+  INVALID_PRODUCT_WEIGHT_UNIT,
+  INVALID_PRODUCT_PRICE,
   INVALID_PRODUCT_STOCKS,
+  INVALID_PRODUCT_SAFETY_STOCKS,
   INVALID_COURIER_CHOOSEN,
 };

@@ -16,6 +16,14 @@ const {
 const {
   MasterStoreEmployees,
 } = require("./objects/master_stores_employees");
+const {
+  MasterCourier,
+} = require("./objects/master_courier");
+const { SequelizeRollback } = require("../utils/functions");
+const {
+  initialMasterCourierValue,
+  initialMasterCategoryValue,
+} = require("../variables/initialValues");
 
 const InitModels = async () => {
   // START ASSOCIATING
@@ -154,8 +162,32 @@ const InitModels = async () => {
     .catch((err) => {
       console.log(err);
     })
-    .finally(() => {
-      console.log("Model initialization completed");
+    .finally(async () => {
+      const trx = await db.transaction();
+      try {
+        await MasterCourier.bulkCreate(
+          initialMasterCourierValue,
+          {
+            ignoreDuplicates: true,
+            transaction: trx,
+            lock: true,
+          }
+        );
+
+        await MasterCategory.bulkCreate(
+          initialMasterCategoryValue,
+          {
+            ignoreDuplicates: true,
+            transaction: trx,
+            lock: true,
+          }
+        );
+
+        trx.commit();
+        console.log("Model initialization completed");
+      } catch (e) {
+        await SequelizeRollback(trx, e);
+      }
     });
 };
 
