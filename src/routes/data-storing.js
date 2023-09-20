@@ -229,8 +229,9 @@ const InitDataStoringRoute = (app) => {
   // POST Method
   // Route: /{version}/user/:id/stores/add
   // This route will store users newly added product and catalogue, it doesn't need approval for now
+  // TODO: create approval for later or approve it by DB first
   app.post(
-    `/v${process.env.APP_MAJOR_VERSION}/store/catalogues/add`,
+    `/v${process.env.APP_MAJOR_VERSION}/store/product/add`,
     checkAuth,
     multerInstance.fields([
       { name: UPLOADED_IMAGE_FILES, maxCount: 5 },

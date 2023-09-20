@@ -21,15 +21,15 @@ const MasterStoreDisplayItem = db.define(
     },
     productDescription: {
       allowNull: false,
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     productHashtag: {
       allowNull: false,
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     productCondition: {
       allowNull: false,
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
     productWeight: {
       allowNull: false,
