@@ -3,7 +3,7 @@ const { db } = require("../../config");
 const {
   initialStoreChannelsValue,
 } = require("../../variables/initialValues");
-const { USER } = require("../../variables/general");
+const { USER, ADMIN } = require("../../variables/general");
 
 const MasterStoreChannels = db.define(
   "MasterStoreChannels",
@@ -22,7 +22,7 @@ const MasterStoreChannels = db.define(
     allowedRoles: {
       allowNull: false,
       type: DataTypes.JSON,
-      defaultValue: `[${USER}]`,
+      defaultValue: `[${(USER, ADMIN)}]`,
     },
     channelsOrder: {
       allowNull: true,
