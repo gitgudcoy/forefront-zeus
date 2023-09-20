@@ -38,19 +38,17 @@ const InitDataDistributorRoute = (app) => {
     async (req, res) => {
       // check query param availability
       if (!req.query)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
+        return res.status(500).send(UNIDENTIFIED_ERROR);
 
       // DB request option declaration
       const storeId = req.query.storeId;
-      const defaultOptions = {
+      let options = {
         status: ACTIVE,
       };
-      const options = storeId
-        ? {
-            id: storeId,
-            ...defaultOptions,
-          }
-        : defaultOptions;
+      options = storeId && {
+        id: storeId,
+        ...options,
+      };
 
       // DB request execution
       await MasterStore.findAll({
@@ -58,9 +56,12 @@ const InitDataDistributorRoute = (app) => {
         include: MasterStoreChannels,
       })
         .then((result) => {
-          result = storeId ? result[0] : result;
+          // single data fetch
+          if (storeId) result = result[0];
           if (storeId && !result)
-            return res.status(204).send(result);
+            return res.sendStatus(404);
+
+          // return if data available
           return res.status(200).send(result);
         })
         .catch((error) => {
