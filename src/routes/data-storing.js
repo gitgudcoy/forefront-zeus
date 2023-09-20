@@ -327,30 +327,34 @@ const InitDataStoringRoute = (app) => {
 
         // insert uploaded image
         // uploaded image files
-        let uploadedImageFiles = req.files[
-          UPLOADED_IMAGE_FILES
-        ].map((obj) => {
-          return createMasterFile(
-            obj,
-            PRODUCT_CATALOGUE_IMAGE,
-            {
-              displayItemId: displayItem.id,
-            }
-          );
-        });
+        let uploadedImageFiles =
+          req.files[UPLOADED_IMAGE_FILES] || [];
+        let uploadedAdditionalFiles =
+          req.files[UPLOADED_ADDITIONAL_FILES] || [];
+
+        uploadedImageFiles = uploadedImageFiles.map(
+          (obj) => {
+            return createMasterFile(
+              obj,
+              PRODUCT_CATALOGUE_IMAGE,
+              {
+                displayItemId: displayItem.id,
+              }
+            );
+          }
+        );
 
         // additional uploaded image files
-        let uploadedAdditionalFiles = req.files[
-          UPLOADED_ADDITIONAL_FILES
-        ].map((obj) => {
-          return createMasterFile(
-            obj,
-            PRODUCT_CATALOGUE_ADDITIONAL_FILES,
-            {
-              displayItemId: displayItem.id,
-            }
-          );
-        });
+        uploadedAdditionalFiles =
+          uploadedAdditionalFiles.map((obj) => {
+            return createMasterFile(
+              obj,
+              PRODUCT_CATALOGUE_ADDITIONAL_FILES,
+              {
+                displayItemId: displayItem.id,
+              }
+            );
+          });
 
         // concat between uploaded files and additional uploaded files
         const fileConcat = uploadedImageFiles.concat(
