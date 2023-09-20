@@ -227,7 +227,7 @@ const InitDataStoringRoute = (app) => {
   );
 
   // POST Method
-  // Route: /{version}/user/:id/stores/add
+  // Route: /{version}/store/product/add?storeId={storeId}
   // This route will store users newly added product and catalogue, it doesn't need approval for now
   // TODO: create approval for later or approve it by DB first
   app.post(
@@ -255,13 +255,12 @@ const InitDataStoringRoute = (app) => {
 
       // Get the request body
       const productInfo = req.body;
-      console.log(productInfo.productWeightUnit);
       const trx = await db.transaction();
       try {
         // find the store for the whole transaction identity
         const store = await MasterStore.findOne({
           where: {
-            storeCode: req.query.code,
+            id: req.query.storeId,
           },
         });
 

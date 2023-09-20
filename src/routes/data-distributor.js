@@ -28,7 +28,7 @@ const { Op } = require("sequelize");
 
 const InitDataDistributorRoute = (app) => {
   /*GET Method
-   * ROUTE: /{version}/store?id={id}
+   * ROUTE: /{version}/stores?id={storeId}
    * This route fetch store info based on its id
    * It can also call all store
    * TODO: give limit to the data requested
@@ -114,8 +114,11 @@ const InitDataDistributorRoute = (app) => {
   );
 
   /*GET Method
-   * ROUTE: /{version}/store/:id/catalogues
+   * There are 2 different route for this endpoint
+   * ROUTE: /{version}/store/catalogues?storeId={storeId}
    * This route fetch all the selected store catalog datasets
+   * ROUTE: /{version}/store/catalogues?storeId={storeId}&isWithProducts={true}
+   * This route will fetch all the product if the toggle is given
    */
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/store/catalogues`,
@@ -126,18 +129,20 @@ const InitDataDistributorRoute = (app) => {
         return res.status(400).send(UNIDENTIFIED_ERROR);
       if (!req.query)
         return res.status(400).send(UNIDENTIFIED_ERROR);
+
+      // map all the query param
+      const storeId = req.query.storeId;
+      const isWithProducts = req.query.isWithProducts;
+
       // Get the request body
-      await MasterStore.findOne({
-        include: MasterStoreCatalogue,
+      await MasterStoreCatalogue.findAll({
         where: {
-          storeCode: req.query.code,
+          storeId: storeId,
           status: ACTIVE,
         },
       })
         .then((result) => {
-          return res
-            .status(200)
-            .send(result.MasterStoreCatalogues);
+          return res.status(200).send(result);
         })
         .catch((error) => {
           SequelizeErrorHandling(error, res);
