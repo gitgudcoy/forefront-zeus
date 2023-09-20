@@ -25,6 +25,9 @@ const {
   MasterStoreEmployees,
 } = require("../models/objects/master_stores_employees");
 const { Op } = require("sequelize");
+const {
+  MasterStoreDisplayItem,
+} = require("../models/objects/master_stores_display_item");
 
 const InitDataDistributorRoute = (app) => {
   /*GET Method
@@ -115,10 +118,17 @@ const InitDataDistributorRoute = (app) => {
 
   /*GET Method
    * There are 2 different route for this endpoint
-   * ROUTE: /{version}/store/catalogues?storeId={storeId}
+   * ROUTE: /{version}/store/catalogues
    * This route fetch all the selected store catalog datasets
-   * ROUTE: /{version}/store/catalogues?storeId={storeId}&isWithProducts={true}
+   * ROUTE: /{version}/store/catalogues?storeId={storeId}&isWithProducts={bool}&isProductOnly={bool}&offset={number}&limit={number}&itemOffset={number}&itemLimit={number}
    * This route will fetch all the product if the toggle is given
+   * storeId = the id for the reference store that has the catalogue
+   * isWithProducts = toggle to query with the associated MasterStoreDisplayItem
+   * isProductOnly = toggle to query with the associated MasterStoreDisplayItem and only returns it
+   * offset = offset the query to MasterStoreCatalogue
+   * limit = limit the query to MasterStoreCatalogue
+   * itemOffset = offset the object of the fetched MasterStoreDisplayItem
+   * itemLimit = limit the object of the fetched MasterStoreDisplayItem
    */
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/store/catalogues`,
@@ -131,17 +141,58 @@ const InitDataDistributorRoute = (app) => {
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
       // map all the query param
-      const storeId = req.query.storeId;
-      const isWithProducts = req.query.isWithProducts;
+      const storeId = req.query.storeId || null;
+      const isWithProducts =
+        req.query.isWithProducts &&
+        JSON.parse(req.query.isWithProducts);
+      const isProductOnly =
+        req.query.isProductOnly &&
+        JSON.parse(req.query.isProductOnly);
+      const offset = parseInt(req.query.offset, 10) || 0;
+      const limit = parseInt(req.query.limit, 10) || null;
+      const itemOffset =
+        parseInt(req.query.itemOffset, 10) || 0;
+      const itemLimit =
+        parseInt(req.query.itemLimit, 10) || null;
+
+      // initialize where option
+      let whereOpt = {
+        status: ACTIVE,
+      };
+
+      whereOpt = storeId && {
+        storeId: storeId,
+        ...options,
+      };
+
+      // map all the option before execute the query
+      const options = {
+        where: whereOpt,
+        offset: offset * limit,
+        limit: limit && limit,
+      };
+
+      // Optionally include the MasterStoreDisplayItem model based on the isWithProducts parameter
+      if (isWithProducts)
+        options.include = MasterStoreDisplayItem;
 
       // Get the request body
-      await MasterStoreCatalogue.findAll({
-        where: {
-          storeId: storeId,
-          status: ACTIVE,
-        },
-      })
+      await MasterStoreCatalogue.findAll(options)
         .then((result) => {
+          if (isWithProducts && isProductOnly) {
+            result = result.reduce((acc, val) => {
+              return acc.concat(
+                val.MasterStoreDisplayItems
+              );
+            }, []);
+
+            // Apply offset and limit to the concatenated books
+            if (itemLimit)
+              result = result.slice(
+                itemOffset * itemLimit,
+                itemLimit
+              );
+          }
           return res.status(200).send(result);
         })
         .catch((error) => {

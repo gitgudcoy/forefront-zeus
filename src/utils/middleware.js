@@ -22,7 +22,7 @@ async function checkAuth(req, res, next) {
 
   await sequelizeSessionStore.get(
     req.headers[X_SID],
-    (err, res) => {
+    (err) => {
       if (err)
         return res
           .status(401)
