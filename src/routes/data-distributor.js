@@ -162,7 +162,7 @@ const InitDataDistributorRoute = (app) => {
 
       whereOpt = storeId && {
         storeId: storeId,
-        ...options,
+        ...whereOpt,
       };
 
       // map all the option before execute the query
