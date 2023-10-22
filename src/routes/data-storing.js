@@ -268,21 +268,21 @@ const InitDataStoringRoute = (app) => {
         // but will use the selected catalogue for the next step of creating display item
         const catalogues =
           await MasterStoreCatalogue.bulkCreate(
-            JSON.parse(productInfo.newCatalogues).map(
-              (obj) => {
-                return {
-                  id: obj.id,
-                  catalogueName: obj.catalogueName,
-                  catalogueCode: generateCode(
-                    8,
-                    req.user,
-                    CLOG
-                  ),
-                  storeId: store.id,
-                  status: ACTIVE,
-                };
-              }
-            ),
+            JSON.parse(
+              productInfo.newCatalogues
+            ).result.map((obj) => {
+              return {
+                id: obj.id,
+                catalogueName: obj.catalogueName,
+                catalogueCode: generateCode(
+                  8,
+                  req.user,
+                  CLOG
+                ),
+                storeId: store.id,
+                status: ACTIVE,
+              };
+            }),
             {
               ignoreDuplicates: true,
               transaction: trx,

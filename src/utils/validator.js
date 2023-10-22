@@ -9,10 +9,8 @@ const {
   EMAIL_REGEX,
   PHONE_REGEX,
   NO_EMPTY_STRING,
-  NO_EMPTY_6_CHAR_REGEX,
-  NO_EMPTY_3_CHAR_REGEX,
   KODE_POS_REGEX,
-  NO_ZERO_VALUE,
+  NO_EMPTY_X_CHAR_REGEX,
 } = require("../variables/regex");
 const {
   INVALID_PRODUCT_NAME,
@@ -43,7 +41,7 @@ const {
 function validateStoreInfo(data) {
   // storeName
   var result = `${data.storeName}`.match(
-    NO_EMPTY_3_CHAR_REGEX
+    NO_EMPTY_X_CHAR_REGEX(3)
   );
   if (!result)
     return { result: result, message: INVALID_STORE_NAME };
@@ -126,7 +124,7 @@ function validateStoreInfo(data) {
 
   // storeAddress
   result = `${data.storeAddress}`.match(
-    NO_EMPTY_6_CHAR_REGEX
+    NO_EMPTY_X_CHAR_REGEX(6)
   );
   if (!result)
     return {
@@ -148,7 +146,7 @@ function validateStoreInfo(data) {
 function validateProductDisplayInfo(data) {
   // productName
   let result = `${data.productName}`.match(
-    NO_EMPTY_3_CHAR_REGEX
+    NO_EMPTY_X_CHAR_REGEX(3)
   );
   if (!result)
     return {
@@ -194,7 +192,7 @@ function validateProductDisplayInfo(data) {
 
   // productHashtag
   result = `${data.productHashtag}`.match(
-    NO_EMPTY_3_CHAR_REGEX
+    NO_EMPTY_X_CHAR_REGEX(3)
   );
   if (!result)
     return {

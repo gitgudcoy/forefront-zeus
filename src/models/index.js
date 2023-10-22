@@ -24,6 +24,7 @@ const {
   initialMasterCourierValue,
   initialMasterCategoryValue,
 } = require("../variables/initialValues");
+const { MasterFile } = require("./objects/master_file");
 
 const InitModels = async () => {
   // START ASSOCIATING
@@ -110,6 +111,24 @@ const InitModels = async () => {
     foreignKey: {
       name: "categoryId",
       allowNull: false,
+    },
+    sourceKey: "id",
+    constraints: false,
+  });
+
+  // MasterFile - MasterStoreDisplayItem ASSOCIATION
+  MasterFile.belongsTo(MasterStoreDisplayItem, {
+    foreignKey: {
+      name: "displayItemId",
+      allowNull: true,
+    },
+    targetKey: "id",
+    constraints: false,
+  });
+  MasterStoreDisplayItem.hasMany(MasterFile, {
+    foreignKey: {
+      name: "displayItemId",
+      allowNull: true,
     },
     sourceKey: "id",
     constraints: false,

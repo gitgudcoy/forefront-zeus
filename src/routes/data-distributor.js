@@ -28,6 +28,10 @@ const { Op } = require("sequelize");
 const {
   MasterStoreDisplayItem,
 } = require("../models/objects/master_stores_display_item");
+const {
+  MasterFile,
+} = require("../models/objects/master_file");
+const { cloneDeep } = require("lodash");
 
 const InitDataDistributorRoute = (app) => {
   /*GET Method
@@ -120,15 +124,15 @@ const InitDataDistributorRoute = (app) => {
    * There are 2 different route for this endpoint
    * ROUTE: /{version}/store/catalogues
    * This route fetch all the selected store catalog datasets
-   * ROUTE: /{version}/store/catalogues?storeId={storeId}&isWithProducts={bool}&isProductOnly={bool}&offset={number}&limit={number}&itemOffset={number}&itemLimit={number}
+   * ROUTE: /{version}/store/catalogues?storeId={storeId}&isWithProducts={bool}&isProductOnly={bool}&offset={number}&limit={number}&itemPage={number}&itemPerPage={number}
    * This route will fetch all the product if the toggle is given
    * storeId = the id for the reference store that has the catalogue
    * isWithProducts = toggle to query with the associated MasterStoreDisplayItem
    * isProductOnly = toggle to query with the associated MasterStoreDisplayItem and only returns it
    * offset = offset the query to MasterStoreCatalogue
    * limit = limit the query to MasterStoreCatalogue
-   * itemOffset = offset the object of the fetched MasterStoreDisplayItem
-   * itemLimit = limit the object of the fetched MasterStoreDisplayItem
+   * itemPage = page of the object set from the fetched MasterStoreDisplayItems
+   * itemPerPage = item per page of the object set from the fetched MasterStoreDisplayItems
    */
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/store/catalogues`,
@@ -148,12 +152,14 @@ const InitDataDistributorRoute = (app) => {
       const isProductOnly =
         req.query.isProductOnly &&
         JSON.parse(req.query.isProductOnly);
-      const offset = parseInt(req.query.offset, 10) || 0;
-      const limit = parseInt(req.query.limit, 10) || null;
-      const itemOffset =
-        parseInt(req.query.itemOffset, 10) || 0;
-      const itemLimit =
-        parseInt(req.query.itemLimit, 10) || null;
+      const offset =
+        parseInt(req.query.offset, 10) || undefined;
+      const limit =
+        parseInt(req.query.limit, 10) || undefined;
+      const itemPage =
+        parseInt(req.query.itemPage, 10) || 0;
+      const itemPerPage =
+        parseInt(req.query.itemPerPage, 10) || null;
 
       // initialize where option
       let whereOpt = {
@@ -168,32 +174,91 @@ const InitDataDistributorRoute = (app) => {
       // map all the option before execute the query
       const options = {
         where: whereOpt,
-        offset: offset * limit,
-        limit: limit && limit,
       };
+
+      // map offset and limit if both parameter present
+      options.limit = limit;
+      options.offset = offset && offset * (limit || 0);
 
       // Optionally include the MasterStoreDisplayItem model based on the isWithProducts parameter
       if (isWithProducts)
-        options.include = MasterStoreDisplayItem;
+        options.include = [
+          {
+            model: MasterStoreDisplayItem,
+            include: [
+              {
+                model: MasterFile,
+                limit: 1,
+                offset: 0,
+              },
+            ],
+          },
+        ];
 
       // Get the request body
       await MasterStoreCatalogue.findAll(options)
         .then((result) => {
-          if (isWithProducts && isProductOnly) {
-            result = result.reduce((acc, val) => {
+          // init arrays
+          let resultArray = cloneDeep(result);
+          let nextArray = [];
+          // instructions
+          let isNext = true;
+          let isPrev = true;
+
+          if (isWithProducts) {
+            resultArray = result.reduce((acc, val) => {
               return acc.concat(
                 val.MasterStoreDisplayItems
               );
             }, []);
 
+            const tempArray = cloneDeep(resultArray);
             // Apply offset and limit to the concatenated books
-            if (itemLimit)
-              result = result.slice(
-                itemOffset * itemLimit,
-                itemLimit
+            if (itemPerPage) {
+              const offset = itemPage * (itemPerPage || 0);
+              const nextOffset =
+                (itemPage + 1) * (itemPerPage || 0);
+              resultArray = tempArray.slice(
+                offset,
+                itemPerPage + offset
               );
+              nextArray = tempArray.slice(
+                nextOffset,
+                itemPerPage + nextOffset
+              );
+            }
+
+            if (itemPage === 0) isPrev = false;
+            if (nextArray.length === 0) isNext = false;
           }
-          return res.status(200).send(result);
+
+          // decide whether the response is
+          // 1.Only Products
+          // 2.Product and Catalogues
+          // 3.Only Catalogues
+          if (isWithProducts && isProductOnly)
+            return res.status(200).send({
+              result: resultArray, // the array
+              instructions: {
+                // intructions of what can be done and what can't
+                isNext: isNext,
+                isPrev: isPrev,
+              },
+            });
+          else if (isWithProducts)
+            return res.status(200).send({
+              result: resultArray, // the array
+              catalogues: result,
+              instructions: {
+                // intructions of what can be done and what can't
+                isNext: isNext,
+                isPrev: isPrev,
+              },
+            });
+          else
+            return res.status(200).send({
+              result,
+            });
         })
         .catch((error) => {
           SequelizeErrorHandling(error, res);
