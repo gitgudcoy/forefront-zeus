@@ -4,8 +4,11 @@ const { defaultRoute } = require("./src/routes/default");
 const { AppConfig } = require("./src/config");
 const { InitModels } = require("./src/models");
 const {
-  InitDataDistributorRoute,
-} = require("./src/routes/data-distributor");
+  InitDistributorRoute: generalDataDistributor,
+} = require("./src/routes/general-data-distributor");
+const {
+  InitDistributorRoute: productDataDistributor,
+} = require("./src/routes/product-data-distributor");
 const {
   InitDataStoringRoute,
 } = require("./src/routes/data-storing");
@@ -19,7 +22,8 @@ InitModels();
 
 // Init Routes
 defaultRoute(app);
-InitDataDistributorRoute(app);
+generalDataDistributor(app);
+productDataDistributor(app);
 InitDataStoringRoute(app);
 
 const port = process.env.PORT || 8004;

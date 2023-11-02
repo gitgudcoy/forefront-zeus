@@ -134,6 +134,24 @@ const InitModels = async () => {
     constraints: false,
   });
 
+  // MasterFile - MasterStoreDisplayItem ASSOCIATION
+  MasterFile.belongsTo(MasterStore, {
+    foreignKey: {
+      name: "storeId",
+      allowNull: true,
+    },
+    targetKey: "id",
+    constraints: false,
+  });
+  MasterStore.hasMany(MasterFile, {
+    foreignKey: {
+      name: "storeId",
+      allowNull: true,
+    },
+    sourceKey: "id",
+    constraints: false,
+  });
+
   // MasterStore - MasterStoreCatalogue ASSOCIATION
   MasterStoreCatalogue.belongsTo(MasterStore, {
     foreignKey: {

@@ -1,7 +1,4 @@
 const {
-  MasterStore,
-} = require("../models/objects/master_stores");
-const {
   SequelizeErrorHandling,
 } = require("../utils/functions");
 const { checkAuth } = require("../utils/middleware");
@@ -12,111 +9,86 @@ const {
   MasterStoreCatalogue,
 } = require("../models/objects/master_stores_catalogue");
 const {
-  MasterCategory,
-} = require("../models/objects/master_category");
-const { ACTIVE } = require("../variables/general");
-const {
-  MasterCourier,
-} = require("../models/objects/master_courier");
-const {
-  MasterStoreChannels,
-} = require("../models/objects/master_stores_channels");
-const {
-  MasterStoreEmployees,
-} = require("../models/objects/master_stores_employees");
-const { Op } = require("sequelize");
-const {
   MasterStoreDisplayItem,
 } = require("../models/objects/master_stores_display_item");
 const {
   MasterFile,
 } = require("../models/objects/master_file");
 const { cloneDeep } = require("lodash");
+const { ACTIVE } = require("../variables/general");
+const {
+  MasterStore,
+} = require("../models/objects/master_stores");
+const {
+  MasterCategory,
+} = require("../models/objects/master_category");
 
-const InitDataDistributorRoute = (app) => {
+const InitDistributorRoute = (app) => {
   /*GET Method
-   * ROUTE: /{version}/stores?id={storeId}
-   * This route fetch store info based on its id
-   * It can also call all store
-   * TODO: give limit to the data requested
+   * ROUTE: /{version}/store/catalogues/product-details
+   * This route requires no checkAuth function
+   * This route need productId param cause it used findByPk function
    */
   app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/stores`,
-    async (req, res) => {
-      // check query param availability
-      if (!req.query)
-        return res.status(500).send(UNIDENTIFIED_ERROR);
-
-      // DB request option declaration
-      const storeId = req.query.storeId;
-      let options = {
-        status: ACTIVE,
-      };
-      options = storeId && {
-        id: storeId,
-        ...options,
-      };
-
-      // DB request execution
-      await MasterStore.findAll({
-        where: options,
-        include: MasterStoreChannels,
-      })
-        .then((result) => {
-          // single data fetch
-          if (storeId) result = result[0];
-          if (storeId && !result)
-            return res.sendStatus(404);
-
-          // return if data available
-          return res.status(200).send(result);
-        })
-        .catch((error) => {
-          SequelizeErrorHandling(error, res);
-        });
-    }
-  );
-
-  /*GET Method
-   * ROUTE: /{version}/user/:id/stores
-   * This route fetch all the user stores datasets
-   */
-  app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores`,
-    checkAuth,
+    `/v${process.env.APP_MAJOR_VERSION}/store/catalogues/product-details`,
     async (req, res) => {
       // check query param availability
       if (!req.params)
         return res.status(400).send(UNIDENTIFIED_ERROR);
-      // Get the request body
-      const userId = req.params.id;
-      // use try catch for error handling
-      try {
-        const employeeStoreRelations =
-          await MasterStoreEmployees.findAll({
-            where: {
-              userId: userId,
-              status: ACTIVE,
+      if (!req.query)
+        return res.status(400).send(UNIDENTIFIED_ERROR);
+
+      // map all the query param
+      const productId = req.query.productId || null;
+
+      // initialize where option
+      let whereOpt = {
+        status: ACTIVE,
+      };
+
+      // map all the option before execute the query
+      const options = {
+        where: whereOpt,
+      };
+
+      // include every necessary relationship
+      options.include = [
+        {
+          model: MasterFile,
+          limit: 5,
+          offset: 0,
+        },
+        {
+          model: MasterCategory,
+        },
+        {
+          model: MasterStoreCatalogue,
+          include: [
+            {
+              model: MasterStore,
+              include: [
+                {
+                  model: MasterFile,
+                },
+              ],
             },
+          ],
+        },
+      ];
+
+      // Get the request body
+      await MasterStoreDisplayItem.findByPk(
+        productId,
+        options
+      )
+        .then((result) => {
+          return res.status(200).send({
+            result,
           });
-
-        const mappedStoreId = employeeStoreRelations.map(
-          (value) => {
-            return { id: value.storeId };
-          }
-        );
-
-        const result = await MasterStore.findAll({
-          where: {
-            [Op.or]: mappedStoreId,
-            status: ACTIVE,
-          },
-          include: MasterStoreEmployees,
+        })
+        .catch((error) => {
+          SequelizeErrorHandling(error, res);
         });
-        return res.status(200).send(result);
-      } catch (error) {
-        SequelizeErrorHandling(error, res);
-      }
     }
   );
 
@@ -128,11 +100,11 @@ const InitDataDistributorRoute = (app) => {
    * This route will fetch all the product if the toggle is given
    * storeId = the id for the reference store that has the catalogue
    * isWithProducts = toggle to query with the associated MasterStoreDisplayItem
-   * isProductOnly = toggle to query with the associated MasterStoreDisplayItem and only returns it
+   * isProductOnly = toggle to query with the associated MasterStoreDisplayItem and only returns it (isWithProducts must TRUE)
    * offset = offset the query to MasterStoreCatalogue
    * limit = limit the query to MasterStoreCatalogue
-   * itemPage = page of the object set from the fetched MasterStoreDisplayItems
-   * itemPerPage = item per page of the object set from the fetched MasterStoreDisplayItems
+   * itemPage = page of the object set from the fetched MasterStoreDisplayItems (isWithProducts must TRUE)
+   * itemPerPage = item per page of the object set from the fetched MasterStoreDisplayItems (isWithProducts must TRUE)
    */
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/store/catalogues`,
@@ -265,52 +237,8 @@ const InitDataDistributorRoute = (app) => {
         });
     }
   );
-
-  /*GET Method
-   * ROUTE: /{version}/category
-   * This route fetch all the selected app product category datasets
-   */
-  app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/category`,
-    checkAuth,
-    async (req, res) => {
-      await MasterCategory.findAll({
-        where: {
-          status: ACTIVE,
-        },
-      })
-        .then((result) => {
-          return res.status(200).send(result);
-        })
-        .catch((error) => {
-          SequelizeErrorHandling(error, res);
-        });
-    }
-  );
-
-  /*GET Method
-   * ROUTE: /{version}/couriers
-   * This route fetch all the selected app product courier datasets
-   */
-  app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/couriers`,
-    checkAuth,
-    async (req, res) => {
-      await MasterCourier.findAll({
-        where: {
-          status: ACTIVE,
-        },
-      })
-        .then((result) => {
-          return res.status(200).send(result);
-        })
-        .catch((error) => {
-          SequelizeErrorHandling(error, res);
-        });
-    }
-  );
 };
 
 module.exports = {
-  InitDataDistributorRoute,
+  InitDistributorRoute,
 };
