@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {
   SEQUELIZE_DATABASE_ERROR,
   SEQUELIZE_VALIDATION_ERROR,
@@ -7,6 +8,21 @@ const { ACTIVE } = require("../variables/general");
 const {
   KEY_HAS_TO_BE_UNIQUE,
 } = require("../variables/responseMessage");
+
+function mapListWithSequelizeOPEQ(
+  list,
+  targetField,
+  elementField
+) {
+  let result = [];
+  for (var element of list) {
+    let temp = {
+      [targetField]: element[elementField],
+    };
+    result.push(temp);
+  }
+  return result;
+}
 
 async function SequelizeRollback(trx, error) {
   console.log(error);
@@ -62,6 +78,7 @@ function createMasterFile(file, fileType, ids) {
 }
 
 module.exports = {
+  mapListWithSequelizeOPEQ,
   SequelizeErrorHandling,
   SequelizeRollback,
   createMasterFile,

@@ -1,5 +1,6 @@
 const {
   SequelizeErrorHandling,
+  mapListWithSequelizeOPEQ,
 } = require("../utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
@@ -22,10 +23,12 @@ const {
 const {
   MasterCategory,
 } = require("../models/objects/master_category");
+const { Op } = require("sequelize");
 
 const InitDistributorRoute = (app) => {
   /*GET Method
    * ROUTE: /{version}/store/catalogues/product-details
+   * This route will fetch product details from the given product
    * This route requires no checkAuth function
    * This route need productId param cause it used findByPk function
    */
@@ -138,10 +141,12 @@ const InitDistributorRoute = (app) => {
         status: ACTIVE,
       };
 
-      whereOpt = storeId && {
-        storeId: storeId,
-        ...whereOpt,
-      };
+      whereOpt = storeId
+        ? {
+            storeId: storeId,
+            ...whereOpt,
+          }
+        : whereOpt;
 
       // map all the option before execute the query
       const options = {
@@ -231,6 +236,74 @@ const InitDistributorRoute = (app) => {
             return res.status(200).send({
               result,
             });
+        })
+        .catch((error) => {
+          SequelizeErrorHandling(error, res);
+        });
+    }
+  );
+
+  /*GET Method
+   * ROUTE: /{version}/products
+   * We use this route to get the requested products by the given ids
+   */
+  app.get(
+    `/v${process.env.APP_MAJOR_VERSION}/products`,
+    async (req, res) => {
+      // check query param availability
+      if (!req.params)
+        return res.status(400).send(UNIDENTIFIED_ERROR);
+      if (!req.query)
+        return res.status(400).send(UNIDENTIFIED_ERROR);
+
+      // get the options from the url param
+      const isWithFiles =
+        req.query.isWithFiles &&
+        JSON.parse(req.query.isWithFiles);
+      const listOfProductIds = req.query.productIds;
+      const offset =
+        parseInt(req.query.offset, 10) || undefined;
+      const limit =
+        parseInt(req.query.limit, 10) || undefined;
+
+      // initialize where option
+      let whereOpt = {
+        status: ACTIVE,
+      };
+
+      // map all the listOfProductIds with sequelize Op.eq
+      whereOpt = listOfProductIds
+        ? {
+            [Op.or]: mapListWithSequelizeOPEQ(
+              listOfProductIds,
+              "id",
+              "id"
+            ),
+            ...whereOpt,
+          }
+        : whereOpt;
+
+      // map all the option before execute the query
+      const options = {
+        where: whereOpt,
+      };
+
+      // map offset and limit if both parameter present
+      options.limit = limit;
+      options.offset = offset && offset * (limit || 0);
+
+      // Optionally include the MasterFile model based on the isWithFiles parameter
+      if (isWithFiles)
+        options.include = [
+          {
+            model: MasterFile,
+          },
+        ];
+
+      // Get the request body
+      await MasterStoreDisplayItem.findAll(options)
+        .then((result) => {
+          return res.status(200).send(result);
         })
         .catch((error) => {
           SequelizeErrorHandling(error, res);

@@ -3,6 +3,7 @@ const {
 } = require("../models/objects/master_stores");
 const {
   SequelizeErrorHandling,
+  mapListWithSequelizeOPEQ,
 } = require("../utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
@@ -42,10 +43,12 @@ const InitDistributorRoute = (app) => {
       let options = {
         status: ACTIVE,
       };
-      options = storeId && {
-        id: storeId,
-        ...options,
-      };
+      options = storeId
+        ? {
+            id: storeId,
+            ...options,
+          }
+        : options;
 
       // DB request execution
       await MasterStore.findAll({
@@ -90,15 +93,13 @@ const InitDistributorRoute = (app) => {
             },
           });
 
-        const mappedStoreId = employeeStoreRelations.map(
-          (value) => {
-            return { id: value.storeId };
-          }
-        );
-
         const result = await MasterStore.findAll({
           where: {
-            [Op.or]: mappedStoreId,
+            [Op.or]: mapListWithSequelizeOPEQ(
+              employeeStoreRelations,
+              "id",
+              "storeId"
+            ),
             status: ACTIVE,
           },
           include: MasterStoreEmployees,
