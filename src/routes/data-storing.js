@@ -1,26 +1,18 @@
 const { db } = require("../config");
 const {
   MasterStore,
-} = require("../models/objects/master_stores");
-const {
   MasterStoreCatalogue,
-} = require("../models/objects/master_stores_catalogue");
-const {
   MasterStoreChannels,
-} = require("../models/objects/master_stores_channels");
-const {
   MasterStoreDisplayItem,
-} = require("../models/objects/master_stores_display_item");
-const {
   MasterStoreEmployees,
-} = require("../models/objects/master_stores_employees");
+} = require("forefront-polus/src/models/index")();
 const { POSTRequest } = require("../utils/axios/post");
 const { generateCode } = require("../utils/formater");
 const {
-  SequelizeRollback,
   SequelizeErrorHandling,
-  createMasterFile,
-} = require("../utils/functions");
+  SequelizeRollback,
+} = require("forefront-polus/src/utils/functions");
+const { createMasterFile } = require("../utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
   validateStoreInfo,
@@ -46,8 +38,8 @@ const {
   EMPLOYEE,
 } = require("../variables/general");
 const {
-  initialStoreChannelsValue,
-} = require("../variables/initialValues");
+  MASTER_STORE_CHANNELS_SEED,
+} = require("forefront-polus/src/seeds/master_store_channels");
 const {
   UNIDENTIFIED_ERROR,
   STORE_ALREADY_EXIST,
@@ -106,7 +98,7 @@ const InitDataStoringRoute = (app) => {
 
         // create creative store channels
         const newChannels = Object.entries(
-          initialStoreChannelsValue()
+          MASTER_STORE_CHANNELS_SEED()
         ).map(([key, val], index) => {
           return {
             channelsOrder: index + 1,
@@ -219,7 +211,6 @@ const InitDataStoringRoute = (app) => {
         await trx.commit();
         return res.sendStatus(200);
       } catch (error) {
-        // TODO: create retry function for an unknown sudden rollback
         await SequelizeRollback(trx, error);
         SequelizeErrorHandling(error, res);
       }

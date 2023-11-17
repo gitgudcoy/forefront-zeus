@@ -1,11 +1,10 @@
 const {
   SequelizeErrorHandling,
-} = require("../utils/functions");
+} = require("forefront-polus/src/utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const { ACTIVE } = require("../variables/general");
-const {
-  MasterCourier,
-} = require("../models/objects/master_courier");
+const { MasterCourier } =
+  require("forefront-polus/src/models/index")();
 
 const InitDistributorRoute = (app) => {
   /*GET Method

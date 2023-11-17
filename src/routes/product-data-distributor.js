@@ -1,28 +1,20 @@
 const {
+  MasterStore,
+  MasterCategory,
+  MasterFile,
+  MasterStoreDisplayItem,
+  MasterStoreCatalogue,
+} = require("forefront-polus/src/models/index")();
+const {
   SequelizeErrorHandling,
   mapListWithSequelizeOPEQ,
-} = require("../utils/functions");
+} = require("forefront-polus/src/utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
   UNIDENTIFIED_ERROR,
 } = require("../variables/responseMessage");
-const {
-  MasterStoreCatalogue,
-} = require("../models/objects/master_stores_catalogue");
-const {
-  MasterStoreDisplayItem,
-} = require("../models/objects/master_stores_display_item");
-const {
-  MasterFile,
-} = require("../models/objects/master_file");
 const { cloneDeep } = require("lodash");
 const { ACTIVE } = require("../variables/general");
-const {
-  MasterStore,
-} = require("../models/objects/master_stores");
-const {
-  MasterCategory,
-} = require("../models/objects/master_category");
 const { Op } = require("sequelize");
 
 const InitDistributorRoute = (app) => {

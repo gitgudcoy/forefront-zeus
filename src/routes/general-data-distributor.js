@@ -1,27 +1,19 @@
 const {
   MasterStore,
-} = require("../models/objects/master_stores");
+  MasterCategory,
+  MasterStoreChannels,
+  MasterCourier,
+  MasterStoreEmployees,
+} = require("forefront-polus/src/models/index")();
 const {
   SequelizeErrorHandling,
   mapListWithSequelizeOPEQ,
-} = require("../utils/functions");
+} = require("forefront-polus/src/utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
   UNIDENTIFIED_ERROR,
 } = require("../variables/responseMessage");
-const {
-  MasterCategory,
-} = require("../models/objects/master_category");
 const { ACTIVE } = require("../variables/general");
-const {
-  MasterCourier,
-} = require("../models/objects/master_courier");
-const {
-  MasterStoreChannels,
-} = require("../models/objects/master_stores_channels");
-const {
-  MasterStoreEmployees,
-} = require("../models/objects/master_stores_employees");
 const { Op } = require("sequelize");
 
 const InitDistributorRoute = (app) => {
