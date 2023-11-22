@@ -5,6 +5,7 @@ const {
   VILLAGE_DEFAULT_VALUE,
   EMPTY_STRING,
 } = require("../variables/general");
+
 const {
   EMAIL_REGEX,
   PHONE_REGEX,
@@ -12,278 +13,225 @@ const {
   KODE_POS_REGEX,
   NO_EMPTY_X_CHAR_REGEX,
 } = require("../variables/regex");
+
 const {
-  INVALID_PRODUCT_NAME,
-  INVALID_PRODUCT_CATEGORY,
-  INVALID_PRODUCT_CATALOG,
-  INVALID_PRODUCT_DESCRIPTION,
-  INVALID_PRODUCT_HASHTAG,
-  INVALID_PRODUCT_CONDITION,
-  INVALID_PRODUCT_WEIGHT,
-  INVALID_PRODUCT_STOCKS,
-  INVALID_PRODUCT_SAFETY_STOCKS,
-  INVALID_COURIER_CHOOSEN,
-  INVALID_STORE_NAME,
-  INVALID_STORE_PHONE,
-  INVALID_STORE_WHATSAPP,
-  INVALID_STORE_EMAIL,
-  INVALID_STORE_PROVINCE,
-  INVALID_STORE_REGENCY,
-  INVALID_STORE_DISTRICT,
-  INVALID_STORE_VILLAGE,
-  INVALID_STORE_ADDRESS,
-  INVALID_STORE_POSTAL_CODE,
-  INVALID_PRODUCT_PRICE,
-  INVALID_PRODUCT_WEIGHT_UNIT,
+  STORE_VALIDATION_MESSAGES,
+  PRODUCT_DISPLAY_VALIDATION_MESSAGES,
+  BUY_ADDRESSES_VALIDATION_MESSAGES,
 } = require("../variables/responseMessage");
 
 // STORE VALIDATION //
+function validateField(data, regex, errorMessage) {
+  const result = `${data}`.match(regex);
+  return result ? null : { result, message: errorMessage };
+}
+
 function validateStoreInfo(data) {
-  // storeName
-  var result = `${data.storeName}`.match(
-    NO_EMPTY_X_CHAR_REGEX(3)
-  );
-  if (!result)
-    return { result: result, message: INVALID_STORE_NAME };
+  const validate = (field, regex, errorMessage) =>
+    validateField(data[field], regex, errorMessage);
 
-  // storePhone
-  result = `${data.storePhone}`.match(PHONE_REGEX);
-  if (!result)
-    return { result: result, message: INVALID_STORE_PHONE };
-
-  // storeWhatsapp
-  result = `${data.storeWhatsapp}`.match(PHONE_REGEX);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_WHATSAPP,
-    };
-
-  // storeEmail
-  result = `${data.storeEmail}`.match(EMAIL_REGEX);
-  if (!result)
-    return { result: result, message: INVALID_STORE_EMAIL };
-
-  // storeProvince
-  result = `${data.storeProvince}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_PROVINCE,
-    };
-  if (
-    data.storeProvince.toUpperCase() ===
-    PROVINCE_DEFAULT_VALUE
-  )
-    return {
+  return (
+    validate(
+      "storeName",
+      NO_EMPTY_X_CHAR_REGEX(3),
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_NAME
+    ) ||
+    validate(
+      "storePhone",
+      PHONE_REGEX,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_PHONE
+    ) ||
+    validate(
+      "storeWhatsapp",
+      PHONE_REGEX,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_WHATSAPP
+    ) ||
+    validate(
+      "storeEmail",
+      EMAIL_REGEX,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_EMAIL
+    ) ||
+    validate(
+      "storeProvince",
+      NO_EMPTY_STRING,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_PROVINCE
+    ) ||
+    (data.storeProvince.toUpperCase() ===
+      PROVINCE_DEFAULT_VALUE && {
       result: null,
-      message: INVALID_STORE_PROVINCE,
-    };
-
-  // storeRegency
-  result = `${data.storeRegency}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_REGENCY,
-    };
-  if (
-    data.storeRegency.toUpperCase() ===
-    REGENCY_DEFAULT_VALUE
-  )
-    return { result: null, message: INVALID_STORE_REGENCY };
-
-  // storeDistrict
-  result = `${data.storeDistrict}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_DISTRICT,
-    };
-  if (
-    data.storeDistrict.toUpperCase() ===
-    DISTRICT_DEFAULT_VALUE
-  )
-    return {
+      message:
+        STORE_VALIDATION_MESSAGES.INVALID_STORE_PROVINCE,
+    }) ||
+    validate(
+      "storeRegency",
+      NO_EMPTY_STRING,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_REGENCY
+    ) ||
+    (data.storeRegency.toUpperCase() ===
+      REGENCY_DEFAULT_VALUE && {
       result: null,
-      message: INVALID_STORE_DISTRICT,
-    };
-
-  // storeVillage
-  result = `${data.storeVillage}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_VILLAGE,
-    };
-  if (
-    data.storeVillage.toUpperCase() ===
-    VILLAGE_DEFAULT_VALUE
-  )
-    return { result: null, message: INVALID_STORE_VILLAGE };
-
-  // storeAddress
-  result = `${data.storeAddress}`.match(
-    NO_EMPTY_X_CHAR_REGEX(6)
+      message:
+        STORE_VALIDATION_MESSAGES.INVALID_STORE_REGENCY,
+    }) ||
+    validate(
+      "storeDistrict",
+      NO_EMPTY_STRING,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_DISTRICT
+    ) ||
+    (data.storeDistrict.toUpperCase() ===
+      DISTRICT_DEFAULT_VALUE && {
+      result: null,
+      message:
+        STORE_VALIDATION_MESSAGES.INVALID_STORE_DISTRICT,
+    }) ||
+    validate(
+      "storeVillage",
+      NO_EMPTY_STRING,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_VILLAGE
+    ) ||
+    (data.storeVillage.toUpperCase() ===
+      VILLAGE_DEFAULT_VALUE && {
+      result: null,
+      message:
+        STORE_VALIDATION_MESSAGES.INVALID_STORE_VILLAGE,
+    }) ||
+    validate(
+      "storeAddress",
+      NO_EMPTY_X_CHAR_REGEX(6),
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_ADDRESS
+    ) ||
+    validate(
+      "storePostalCode",
+      KODE_POS_REGEX,
+      STORE_VALIDATION_MESSAGES.INVALID_STORE_POSTAL_CODE
+    ) || { result: true, message: EMPTY_STRING }
   );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_ADDRESS,
-    };
-
-  // storePostalCode
-  result = `${data.storePostalCode}`.match(KODE_POS_REGEX);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_STORE_POSTAL_CODE,
-    };
-  return { result: result, message: EMPTY_STRING };
 }
 
 // PRODUCT CATALOG VALIDATION
 function validateProductDisplayInfo(data) {
-  // productName
-  let result = `${data.productName}`.match(
-    NO_EMPTY_X_CHAR_REGEX(3)
+  const validate = (field, regex, errorMessage) =>
+    validateField(data[field], regex, errorMessage);
+
+  return (
+    validate(
+      "productName",
+      NO_EMPTY_X_CHAR_REGEX(3),
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_NAME
+    ) ||
+    validate(
+      "productCategory",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATEGORY
+    ) ||
+    (data.productCategory === "undefined" && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATEGORY,
+    }) ||
+    validate(
+      "productCatalog",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATALOG
+    ) ||
+    (data.productCatalog === "undefined" && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATALOG,
+    }) ||
+    validate(
+      "productDescription",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_DESCRIPTION
+    ) ||
+    validate(
+      "productHashtag",
+      NO_EMPTY_X_CHAR_REGEX(3),
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_HASHTAG
+    ) ||
+    validate(
+      "productCondition",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CONDITION
+    ) ||
+    validate(
+      "productWeight",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_WEIGHT
+    ) ||
+    (data.productWeight <= 0 && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_WEIGHT,
+    }) ||
+    validate(
+      "productWeightUnit",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_WEIGHT_UNIT
+    ) ||
+    validate(
+      "productPrice",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_PRICE
+    ) ||
+    (data.productPrice <= 0 && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_PRICE,
+    }) ||
+    validate(
+      "productStocks",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_STOCKS
+    ) ||
+    (data.productStocks <= 0 && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_STOCKS,
+    }) ||
+    validate(
+      "productSafetyStocks",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_SAFETY_STOCKS
+    ) ||
+    (data.productSafetyStocks <= 0 && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_SAFETY_STOCKS,
+    }) ||
+    (data.courierChoosen <= 0 && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_COURIER_CHOOSEN,
+    }) || { result: true, message: EMPTY_STRING }
   );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_NAME,
-    };
+}
 
-  // productCategory
-  result = `${data.productCategory}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_CATEGORY,
-    };
-  if (data.productCategory === "undefined")
-    return {
-      result: null,
-      message: INVALID_PRODUCT_CATEGORY,
-    };
+function validateBuyAddressesInfo(data) {
+  const validate = (field, regex, errorMessage) =>
+    validateField(data[field], regex, errorMessage);
 
-  // productCatalog
-  result = `${data.productCatalog}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_CATALOG,
-    };
-  if (data.productCatalog === "undefined")
-    return {
-      result: null,
-      message: INVALID_PRODUCT_CATALOG,
-    };
-
-  // productDescription
-  result = `${data.productDescription}`.match(
-    NO_EMPTY_STRING
+  return (
+    validate(
+      "addressLabel",
+      NO_EMPTY_X_CHAR_REGEX(3),
+      BUY_ADDRESSES_VALIDATION_MESSAGES.INVALID_ADDRESS_LABEL
+    ) ||
+    validate(
+      "addressDetail",
+      NO_EMPTY_STRING,
+      BUY_ADDRESSES_VALIDATION_MESSAGES.INVALID_ADDRESS_DETAIL
+    ) ||
+    validate(
+      "addressPhoneNumber",
+      NO_EMPTY_STRING,
+      BUY_ADDRESSES_VALIDATION_MESSAGES.INVALID_ADDRESS_PHONENUMBER
+    ) || { result: true, message: EMPTY_STRING }
   );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_DESCRIPTION,
-    };
-
-  // productHashtag
-  result = `${data.productHashtag}`.match(
-    NO_EMPTY_X_CHAR_REGEX(3)
-  );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_HASHTAG,
-    };
-
-  // productCondition
-  result = `${data.productCondition}`.match(
-    NO_EMPTY_STRING
-  );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_CONDITION,
-    };
-
-  // productWeight
-  result = `${data.productWeight}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_WEIGHT,
-    };
-  if (data.productWeight <= 0)
-    return {
-      result: null,
-      message: INVALID_PRODUCT_WEIGHT,
-    };
-
-  // productWeightUnit
-  result = `${data.productWeightUnit}`.match(
-    NO_EMPTY_STRING
-  );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_WEIGHT_UNIT,
-    };
-
-  // productPrice
-  result = `${data.productPrice}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_PRICE,
-    };
-  if (data.productPrice <= 0)
-    return {
-      result: null,
-      message: INVALID_PRODUCT_PRICE,
-    };
-
-  // productStocks
-  result = `${data.productStocks}`.match(NO_EMPTY_STRING);
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_STOCKS,
-    };
-  if (data.productStocks <= 0)
-    return {
-      result: null,
-      message: INVALID_PRODUCT_STOCKS,
-    };
-
-  // productSafetyStocks
-  result = `${data.productSafetyStocks}`.match(
-    NO_EMPTY_STRING
-  );
-  if (!result)
-    return {
-      result: result,
-      message: INVALID_PRODUCT_SAFETY_STOCKS,
-    };
-  if (data.productSafetyStocks <= 0)
-    return {
-      result: null,
-      message: INVALID_PRODUCT_SAFETY_STOCKS,
-    };
-
-  // courierChoosen
-  if (data.courierChoosen <= 0)
-    return {
-      result: null,
-      message: INVALID_COURIER_CHOOSEN,
-    };
-  return { result: result, message: EMPTY_STRING };
 }
 
 module.exports = {
   validateStoreInfo,
   validateProductDisplayInfo,
+  validateBuyAddressesInfo,
 };

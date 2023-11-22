@@ -1,100 +1,63 @@
-// GENERAL
-const ADMIN = "ADMIN";
-const USER = "USER";
-const SUCCESS = "SUCCESS";
-const STORE_PROFILE_PICTURE = "STORE_PROFILE_PICTURE";
-const PRODUCT_CATALOGUE_IMAGE = "PRODUCT_CATALOGUE_IMAGE";
-const PRODUCT_CATALOGUE_ADDITIONAL_FILES =
+// Constants
+exports.ADMIN = "ADMIN";
+exports.USER = "USER";
+exports.SUCCESS = "SUCCESS";
+exports.STORE_PROFILE_PICTURE = "STORE_PROFILE_PICTURE";
+exports.PRODUCT_CATALOGUE_IMAGE = "PRODUCT_CATALOGUE_IMAGE";
+exports.PRODUCT_CATALOGUE_ADDITIONAL_FILES =
   "PRODUCT_CATALOGUE_ADDITIONAL_FILES";
 
-// STORE ROLES
-const EMPLOYEE = "EMPLOYEE";
-const LEVEL_1 = "LEVEL_1";
+// Store Roles
+exports.EMPLOYEE = "EMPLOYEE";
+exports.LEVEL_1 = "LEVEL_1";
 
-// MULTER NAMES
-const UPLOADED_IMAGE_FILES = "uploadedImageFiles";
-const UPLOADED_ADDITIONAL_FILES = "uploadedAdditionalFiles";
-const UPLOADED_STORE_PROFILE_PICTURE =
+// Multer Names
+exports.UPLOADED_IMAGE_FILES = "uploadedImageFiles";
+exports.UPLOADED_ADDITIONAL_FILES =
+  "uploadedAdditionalFiles";
+exports.UPLOADED_STORE_PROFILE_PICTURE =
   "uploadedStoreProfilePicture";
 
-// PREFIXES
-const STR = "STR"; // this is the prefix for store code
-const PRD = "PRD"; // this is the prefix for product code
-const CLOG = "CLOG"; // this is the prefix for catalogue code
+// Prefixes
+exports.STR = "STR";
+exports.PRD = "PRD";
+exports.CLOG = "CLOG";
 
-// AXIOS
-const POST = "POST";
-const GET = "GET";
+// Axios
+exports.POST = "POST";
+exports.GET = "GET";
 
-// AXIOS LOG TITLE
-const GET_CHECK_AUTH_TOKEN = "GET_CHECK_AUTH_TOKEN";
-const POST_SEND_PROFILEPIC = "POST_SEND_PROFILEPIC";
-const POST_ADD_CATALOGUE = "POST_ADD_CATALOGUE";
-const POST_UPLOAD_FILES = "POST_UPLOAD_FILES";
+// Axios Log Titles
+exports.GET_CHECK_AUTH_TOKEN = "GET_CHECK_AUTH_TOKEN";
+exports.POST_SEND_PROFILEPIC = "POST_SEND_PROFILEPIC";
+exports.POST_ADD_CATALOGUE = "POST_ADD_CATALOGUE";
+exports.POST_UPLOAD_FILES = "POST_UPLOAD_FILES";
 
-// HEADER NAME
-const X_SID = "x-sid";
-const AUTHORIZATION = "authorization";
-const CONTENT_TYPE = "Content-Type";
+// Headers
+exports.X_SID = "x-sid";
+exports.AUTHORIZATION = "authorization";
+exports.CONTENT_TYPE = "Content-Type";
 
-// EMAIL SUBJECT
-const OTP_EMAIL =
+// Email Subject
+exports.OTP_EMAIL =
   "Account Registration - Berikut adalah nomor OTPmu, jangan disebar ya !";
 
 // API URLs
-const CHECK_AUTH_TOKEN = `/v${process.env.APP_OLYMPUS_SERVICE_MAJOR_VERSION}/auth/check`;
-const UPLOAD_FILES = `/v${process.env.APP_CHRONOS_MAJOR_VERSION}/files/upload`;
+exports.CHECK_AUTH_TOKEN = `/v${process.env.APP_OLYMPUS_SERVICE_MAJOR_VERSION}/auth/check`;
+exports.UPLOAD_FILES = `/v${process.env.APP_CHRONOS_MAJOR_VERSION}/files/upload`;
 
-// STATUSES
-const ACTIVE = "ACTIVE";
-const NON_ACTIVE = "NON_ACTIVE";
-const DELETED = "DELETED";
+// Statuses
+exports.ACTIVE = "ACTIVE";
+exports.NON_ACTIVE = "NON_ACTIVE";
+exports.DELETED = "DELETED";
 
-// DEFAULT VALUES
-const PROVINCE_DEFAULT_VALUE = "PILIH PROVINSI";
-const REGENCY_DEFAULT_VALUE = "PILIH KOTA";
-const DISTRICT_DEFAULT_VALUE = "PILIH KECAMATAN";
-const VILLAGE_DEFAULT_VALUE = "PILIH KELURAHAN";
+// Default Values
+exports.PROVINCE_DEFAULT_VALUE = "PILIH PROVINSI";
+exports.REGENCY_DEFAULT_VALUE = "PILIH KOTA";
+exports.DISTRICT_DEFAULT_VALUE = "PILIH KECAMATAN";
+exports.VILLAGE_DEFAULT_VALUE = "PILIH KELURAHAN";
 
-// OTHERS
-const EMPTY_STRING = "";
-const ALPHABETH_CHAR_AND_NUMBER =
+// Others
+exports.EMPTY_STRING = "";
+exports.ALPHABETH_CHAR_AND_NUMBER =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-module.exports = {
-  POST_ADD_CATALOGUE,
-  POST_SEND_PROFILEPIC,
-  STORE_PROFILE_PICTURE,
-  PRODUCT_CATALOGUE_IMAGE,
-  PRODUCT_CATALOGUE_ADDITIONAL_FILES,
-  UPLOADED_STORE_PROFILE_PICTURE,
-  UPLOADED_IMAGE_FILES,
-  UPLOADED_ADDITIONAL_FILES,
-  ADMIN,
-  USER,
-  EMPLOYEE,
-  LEVEL_1,
-  SUCCESS,
-  X_SID,
-  AUTHORIZATION,
-  CONTENT_TYPE,
-  STR,
-  PRD,
-  CLOG,
-  POST,
-  GET,
-  POST_UPLOAD_FILES,
-  UPLOAD_FILES,
-  GET_CHECK_AUTH_TOKEN,
-  OTP_EMAIL,
-  CHECK_AUTH_TOKEN,
-  EMPTY_STRING,
-  ALPHABETH_CHAR_AND_NUMBER,
-  ACTIVE,
-  NON_ACTIVE,
-  DELETED,
-  PROVINCE_DEFAULT_VALUE,
-  REGENCY_DEFAULT_VALUE,
-  DISTRICT_DEFAULT_VALUE,
-  VILLAGE_DEFAULT_VALUE,
-};

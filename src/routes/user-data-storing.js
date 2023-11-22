@@ -1,14 +1,14 @@
 const { db } = require("../config");
 const { MasterUserBuyAddresses } =
   require("forefront-polus/src/models/index")();
-const { POSTRequest } = require("../utils/axios/post");
-const { generateCode } = require("../utils/formater");
 const {
   SequelizeErrorHandling,
   SequelizeRollback,
 } = require("forefront-polus/src/utils/functions");
 const { checkAuth } = require("../utils/middleware");
-const { validateStoreInfo } = require("../utils/validator");
+const {
+  validateBuyAddressesInfo,
+} = require("../utils/validator");
 const { ACTIVE } = require("../variables/general");
 const {
   UNIDENTIFIED_ERROR,
@@ -16,9 +16,8 @@ const {
 
 const InitDataStoringRoute = (app) => {
   // POST Method
-  // Route: /{version}/user/:id/stores/add
-  // This route will store users new requested store, though it still need approval later
-  // TODO: To ease the development, this route will set the approval status to be "APPROVE" for now
+  // Route: /{version}/user/:id/saved-address
+  // This route will post the newly saved user address
   app.post(
     `/v${process.env.APP_MAJOR_VERSION}/user/:id/saved-address`,
     checkAuth,
@@ -29,11 +28,8 @@ const InitDataStoringRoute = (app) => {
       if (!req.params)
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
-      // Get the request body
-      const userId = req.params.id;
-
       // Validate req body
-      const validationResult = validateProductDisplayInfo(
+      const validationResult = validateBuyAddressesInfo(
         req.body
       );
       if (!validationResult.result)
@@ -54,10 +50,12 @@ const InitDataStoringRoute = (app) => {
         const inserting = {
           addressLabel: addressInfo.addressLabel,
           addressDetail: addressInfo.addressDetail,
-          addressLatitude: addressInfo.addressLatitude,
-          addressLongitude: addressInfo.addressLongitude,
+          addressCourierNote:
+            addressInfo.addressCourierNote,
           addressPhoneNumber:
             addressInfo.addressPhoneNumber,
+          addressLatitude: addressInfo.addressLatitude,
+          addressLongitude: addressInfo.addressLongitude,
           userId: addressInfo.userId,
           status: ACTIVE,
         };
