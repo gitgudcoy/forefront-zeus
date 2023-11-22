@@ -28,8 +28,6 @@ const InitDistributorRoute = (app) => {
     `/v${process.env.APP_MAJOR_VERSION}/store/catalogues/product-details`,
     async (req, res) => {
       // check query param availability
-      if (!req.params)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
       if (!req.query)
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
@@ -106,8 +104,6 @@ const InitDistributorRoute = (app) => {
     checkAuth,
     async (req, res) => {
       // check query param availability
-      if (!req.params)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
       if (!req.query)
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
@@ -243,8 +239,6 @@ const InitDistributorRoute = (app) => {
     `/v${process.env.APP_MAJOR_VERSION}/products`,
     async (req, res) => {
       // check query param availability
-      if (!req.params)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
       if (!req.query)
         return res.status(400).send(UNIDENTIFIED_ERROR);
 

@@ -12,8 +12,11 @@ const {
   InitDistributorRoute: userDataDistributor,
 } = require("./src/routes/user-data-distributor");
 const {
-  InitDataStoringRoute,
-} = require("./src/routes/data-storing");
+  InitDataStoringRoute: generalDataStoring,
+} = require("./src/routes/general-data-storing");
+const {
+  InitDataStoringRoute: userDataStoring,
+} = require("./src/routes/user-data-storing");
 var app = express();
 
 // Init App configurations
@@ -24,7 +27,8 @@ defaultRoute(app);
 generalDataDistributor(app);
 productDataDistributor(app);
 userDataDistributor(app);
-InitDataStoringRoute(app);
+generalDataStoring(app);
+userDataStoring(app);
 
 const port = process.env.PORT || 8004;
 app.listen(port, () => {

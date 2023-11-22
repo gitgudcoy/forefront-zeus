@@ -3,18 +3,15 @@ const {
   MasterCategory,
   MasterStoreChannels,
   MasterCourier,
-  MasterStoreEmployees,
 } = require("forefront-polus/src/models/index")();
 const {
   SequelizeErrorHandling,
-  mapListWithSequelizeOPEQ,
 } = require("forefront-polus/src/utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const {
   UNIDENTIFIED_ERROR,
 } = require("../variables/responseMessage");
 const { ACTIVE } = require("../variables/general");
-const { Op } = require("sequelize");
 
 const InitDistributorRoute = (app) => {
   /*GET Method
@@ -59,47 +56,6 @@ const InitDistributorRoute = (app) => {
         .catch((error) => {
           SequelizeErrorHandling(error, res);
         });
-    }
-  );
-
-  /*GET Method
-   * ROUTE: /{version}/user/:id/stores
-   * This route fetch all the user stores datasets
-   */
-  app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores`,
-    checkAuth,
-    async (req, res) => {
-      // check query param availability
-      if (!req.params)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
-      // Get the request body
-      const userId = req.params.id;
-      // use try catch for error handling
-      try {
-        const employeeStoreRelations =
-          await MasterStoreEmployees.findAll({
-            where: {
-              userId: userId,
-              status: ACTIVE,
-            },
-          });
-
-        const result = await MasterStore.findAll({
-          where: {
-            [Op.or]: mapListWithSequelizeOPEQ(
-              employeeStoreRelations,
-              "id",
-              "storeId"
-            ),
-            status: ACTIVE,
-          },
-          include: MasterStoreEmployees,
-        });
-        return res.status(200).send(result);
-      } catch (error) {
-        SequelizeErrorHandling(error, res);
-      }
     }
   );
 
