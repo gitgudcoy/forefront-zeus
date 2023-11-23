@@ -60,14 +60,17 @@ const InitDataStoringRoute = (app) => {
           status: ACTIVE,
         };
 
-        await MasterUserBuyAddresses.create(inserting, {
-          transaction: trx,
-          lock: true,
-        });
+        const result = await MasterUserBuyAddresses.create(
+          inserting,
+          {
+            transaction: trx,
+            lock: true,
+          }
+        );
 
         // commit transaction
         await trx.commit();
-        return res.sendStatus(200);
+        return res.status(200).send(result);
       } catch (error) {
         await SequelizeRollback(trx, error);
         SequelizeErrorHandling(error, res);

@@ -224,7 +224,7 @@ function validateBuyAddressesInfo(data) {
     ) ||
     validate(
       "addressPhoneNumber",
-      NO_EMPTY_STRING,
+      PHONE_REGEX,
       BUY_ADDRESSES_VALIDATION_MESSAGES.INVALID_ADDRESS_PHONENUMBER
     ) || { result: true, message: EMPTY_STRING }
   );
