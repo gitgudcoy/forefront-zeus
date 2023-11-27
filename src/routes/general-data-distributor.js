@@ -3,6 +3,7 @@ const {
   MasterCategory,
   MasterStoreChannels,
   MasterCourier,
+  MasterFile,
 } = require("forefront-polus/src/models/index")();
 const {
   SequelizeErrorHandling,
@@ -12,6 +13,7 @@ const {
   UNIDENTIFIED_ERROR,
 } = require("../variables/responseMessage");
 const { ACTIVE } = require("../variables/general");
+const { splitArrayForGrid } = require("../utils/functions");
 
 const InitDistributorRoute = (app) => {
   /*GET Method
@@ -29,22 +31,50 @@ const InitDistributorRoute = (app) => {
 
       // DB request option declaration
       const storeId = req.query.storeId;
-      let options = {
+      const isGrid = req.query.isGrid;
+      const isWithFiles = req.query.isWithFiles;
+      const gridLimit =
+        parseInt(req.query.gridLimit, 10) || undefined;
+
+      // initialize where option
+      let whereOpt = {
         status: ACTIVE,
       };
-      options = storeId
-        ? {
-            id: storeId,
-            ...options,
-          }
-        : options;
+
+      if (storeId)
+        whereOpt = {
+          id: storeId,
+          ...whereOpt,
+        };
+
+      // map all the option before execute the query
+      const options = {
+        where: whereOpt,
+        include: [
+          {
+            model: MasterStoreChannels,
+          },
+        ],
+      };
+
+      if (isWithFiles) {
+        options.include.push({
+          model: MasterFile,
+        });
+      }
 
       // DB request execution
-      await MasterStore.findAll({
-        where: options,
-        include: MasterStoreChannels,
-      })
+      await MasterStore.findAll(options)
         .then((result) => {
+          // grid format data fetch
+          if (isGrid) {
+            // we need to split it into scrollable grid cards data
+            const splitted = splitArrayForGrid(
+              result,
+              gridLimit
+            );
+            return res.status(200).send(splitted);
+          }
           // single data fetch
           if (storeId) result = result[0];
           if (storeId && !result)
@@ -65,7 +95,6 @@ const InitDistributorRoute = (app) => {
    */
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/category`,
-    checkAuth,
     async (req, res) => {
       await MasterCategory.findAll({
         where: {
@@ -87,7 +116,6 @@ const InitDistributorRoute = (app) => {
    */
   app.get(
     `/v${process.env.APP_MAJOR_VERSION}/couriers`,
-    checkAuth,
     async (req, res) => {
       await MasterCourier.findAll({
         where: {

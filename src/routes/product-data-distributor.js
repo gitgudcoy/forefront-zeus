@@ -16,6 +16,7 @@ const {
 const { cloneDeep } = require("lodash");
 const { ACTIVE } = require("../variables/general");
 const { Op } = require("sequelize");
+const { splitArrayForGrid } = require("../utils/functions");
 
 const InitDistributorRoute = (app) => {
   /*GET Method
@@ -243,10 +244,12 @@ const InitDistributorRoute = (app) => {
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
       // get the options from the url param
-      const isWithFiles =
-        req.query.isWithFiles &&
-        JSON.parse(req.query.isWithFiles);
       const listOfProductIds = req.query.productIds;
+      const isWithFiles = req.query.isWithFiles;
+      const isWithStoreInfo = req.query.isWithStoreInfo;
+      const isGrid = req.query.isGrid;
+      const gridLimit =
+        parseInt(req.query.gridLimit, 10) || undefined;
       const offset =
         parseInt(req.query.offset, 10) || undefined;
       const limit =
@@ -258,16 +261,15 @@ const InitDistributorRoute = (app) => {
       };
 
       // map all the listOfProductIds with sequelize Op.eq
-      whereOpt = listOfProductIds
-        ? {
-            [Op.or]: mapListWithSequelizeOPEQ(
-              listOfProductIds,
-              "id",
-              "id"
-            ),
-            ...whereOpt,
-          }
-        : whereOpt;
+      if (listOfProductIds)
+        whereOpt = {
+          [Op.or]: mapListWithSequelizeOPEQ(
+            listOfProductIds,
+            "id",
+            "id"
+          ),
+          ...whereOpt,
+        };
 
       // map all the option before execute the query
       const options = {
@@ -275,20 +277,43 @@ const InitDistributorRoute = (app) => {
       };
 
       // map offset and limit if both parameter present
-      options.limit = limit;
-      options.offset = offset && offset * (limit || 0);
+      if (limit) options.limit = limit;
+      if (offset) options.offset = offset * (limit || 0);
 
-      // Optionally include the MasterFile model based on the isWithFiles parameter
-      if (isWithFiles)
-        options.include = [
-          {
+      // Optionally include the desired related model based on the the parameters
+      if (isWithFiles || isWithStoreInfo) {
+        options.include = [];
+        isWithFiles &&
+          options.include.push({
             model: MasterFile,
-          },
-        ];
+          });
+        isWithStoreInfo &&
+          options.include.push({
+            model: MasterStoreCatalogue,
+            include: [
+              {
+                model: MasterStore,
+                include: [
+                  {
+                    model: MasterFile,
+                  },
+                ],
+              },
+            ],
+          });
+      }
 
       // Get the request body
       await MasterStoreDisplayItem.findAll(options)
         .then((result) => {
+          if (isGrid) {
+            // we need to split it into scrollable grid cards data
+            const splitted = splitArrayForGrid(
+              result,
+              gridLimit
+            );
+            return res.status(200).send(splitted);
+          }
           return res.status(200).send(result);
         })
         .catch((error) => {
