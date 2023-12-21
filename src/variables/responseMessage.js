@@ -64,6 +64,8 @@ const PRODUCT_DISPLAY_VALIDATION_MESSAGES = {
     "Mohon input jumlah safety stok dengan benar",
   INVALID_COURIER_CHOOSEN:
     "Mohon input kurir yang dapat digunakan untuk penjemputan dengan benar",
+  NO_PRODUCT_IMAGE_FOUND:
+    "Mohon input foto produkmu, minimal 1",
 };
 
 const BUY_ADDRESSES_VALIDATION_MESSAGES = {

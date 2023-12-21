@@ -44,6 +44,7 @@ const {
   UNIDENTIFIED_ERROR,
   STORE_ALREADY_EXIST,
   INTERNAL_ERROR_CANT_COMMUNICATE,
+  PRODUCT_DISPLAY_VALIDATION_MESSAGES,
 } = require("../variables/responseMessage");
 const multerInstance = require("multer")({
   limits: { fieldSize: 25 * 1024 * 1024 },
@@ -244,6 +245,19 @@ const InitDataStoringRoute = (app) => {
           .status(400)
           .send(validationResult.message);
 
+      // uploaded image files
+      let uploadedImageFiles =
+        req.files[UPLOADED_IMAGE_FILES] || [];
+      let uploadedAdditionalFiles =
+        req.files[UPLOADED_ADDITIONAL_FILES] || [];
+
+      if (uploadedImageFiles.length === 0)
+        return res
+          .status(400)
+          .send(
+            PRODUCT_DISPLAY_VALIDATION_MESSAGES.NO_PRODUCT_IMAGE_FOUND
+          );
+
       // Get the request body
       const productInfo = req.body;
       const trx = await db.transaction();
@@ -316,12 +330,6 @@ const InitDataStoringRoute = (app) => {
           );
 
         // insert uploaded image
-        // uploaded image files
-        let uploadedImageFiles =
-          req.files[UPLOADED_IMAGE_FILES] || [];
-        let uploadedAdditionalFiles =
-          req.files[UPLOADED_ADDITIONAL_FILES] || [];
-
         uploadedImageFiles = uploadedImageFiles.map(
           (obj) => {
             return createMasterFile(
