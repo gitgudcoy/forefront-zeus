@@ -199,7 +199,7 @@ function validateProductDisplayInfo(data) {
       message:
         PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_SAFETY_STOCKS,
     }) ||
-    (data.courierChoosen <= 0 && {
+    (JSON.parse(data.courierChoosen).length <= 0 && {
       result: null,
       message:
         PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_COURIER_CHOOSEN,
