@@ -158,7 +158,7 @@ const InitDataStoringRoute = (app) => {
         if (!req.file) {
           // commit transaction
           await trx.commit();
-          return res.sendStatus(200);
+          return res.status(200).send(store.id);
         }
 
         // uploaded store profile picture
@@ -210,7 +210,7 @@ const InitDataStoringRoute = (app) => {
 
         // commit transaction
         await trx.commit();
-        return res.sendStatus(200);
+        return res.status(200).send(store.id);
       } catch (error) {
         await SequelizeRollback(trx, error);
         SequelizeErrorHandling(error, res);
