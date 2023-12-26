@@ -247,9 +247,6 @@ const InitDistributorRoute = (app) => {
       const listOfProductIds = req.query.productIds;
       const isWithFiles = req.query.isWithFiles;
       const isWithStoreInfo = req.query.isWithStoreInfo;
-      const isGrid = req.query.isGrid;
-      const gridLimit =
-        parseInt(req.query.gridLimit, 10) || undefined;
       const offset =
         parseInt(req.query.offset, 10) || undefined;
       const limit =
@@ -303,22 +300,24 @@ const InitDistributorRoute = (app) => {
           });
       }
 
-      // Get the request body
-      await MasterStoreDisplayItem.findAll(options)
-        .then((result) => {
-          if (isGrid) {
-            // we need to split it into scrollable grid cards data
-            const splitted = splitArrayForGrid(
-              result,
-              gridLimit
-            );
-            return res.status(200).send(splitted);
-          }
-          return res.status(200).send(result);
-        })
-        .catch((error) => {
-          SequelizeErrorHandling(error, res);
-        });
+      let result;
+      let resultCount;
+      try {
+        result = await MasterStoreDisplayItem.findAll(
+          options
+        );
+        resultCount = await MasterStoreDisplayItem.count();
+      } catch (error) {
+        SequelizeErrorHandling(error, res);
+      }
+
+      // assign values to the final response template
+      let response = {
+        result,
+        itemCount: resultCount,
+      };
+
+      return res.status(200).send(response);
     }
   );
 };

@@ -31,10 +31,7 @@ const InitDistributorRoute = (app) => {
 
       // DB request option declaration
       const storeId = req.query.storeId;
-      const isGrid = req.query.isGrid;
       const isWithFiles = req.query.isWithFiles;
-      const gridLimit =
-        parseInt(req.query.gridLimit, 10) || undefined;
 
       // initialize where option
       let whereOpt = {
@@ -66,15 +63,6 @@ const InitDistributorRoute = (app) => {
       // DB request execution
       await MasterStore.findAll(options)
         .then((result) => {
-          // grid format data fetch
-          if (isGrid) {
-            // we need to split it into scrollable grid cards data
-            const splitted = splitArrayForGrid(
-              result,
-              gridLimit
-            );
-            return res.status(200).send(splitted);
-          }
           // single data fetch
           if (storeId) result = result[0];
           if (storeId && !result)
