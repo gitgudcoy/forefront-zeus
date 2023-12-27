@@ -301,12 +301,19 @@ const InitDistributorRoute = (app) => {
       }
 
       let result;
-      let resultCount;
+      let masterCount;
+      const masterCountOption = {
+        limit: 0,
+        offset: 0,
+        where: whereOpt,
+      };
       try {
         result = await MasterStoreDisplayItem.findAll(
           options
         );
-        resultCount = await MasterStoreDisplayItem.count();
+        masterCount = await MasterStoreDisplayItem.count(
+          masterCountOption
+        );
       } catch (error) {
         SequelizeErrorHandling(error, res);
       }
@@ -314,7 +321,7 @@ const InitDistributorRoute = (app) => {
       // assign values to the final response template
       let response = {
         result,
-        itemCount: resultCount,
+        masterCount,
       };
 
       return res.status(200).send(response);
