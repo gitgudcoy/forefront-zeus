@@ -14,9 +14,15 @@ const {
   UNIDENTIFIED_ERROR,
 } = require("../variables/responseMessage");
 const { cloneDeep } = require("lodash");
-const { ACTIVE } = require("../variables/general");
-const { Op } = require("sequelize");
-const { splitArrayForGrid } = require("../utils/functions");
+const {
+  ACTIVE,
+  FILTER_RATING,
+  FILTER_STORE_LEVEL,
+  FILTER_COURIER,
+  FILTER_STORE_LOCATION,
+  FILTER_PRICE_RANGE,
+} = require("../variables/general");
+const { Op, Sequelize } = require("sequelize");
 
 const InitDistributorRoute = (app) => {
   /*GET Method
@@ -243,7 +249,20 @@ const InitDistributorRoute = (app) => {
       if (!req.query)
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
+      // Variables
+      const defaultResultOrder = "createdAt";
+      const defaultResultOrderValue = "DESC";
+      let mapped = {
+        [FILTER_STORE_LEVEL]: [],
+        [FILTER_RATING]: [],
+        [FILTER_STORE_LOCATION]: [],
+        [FILTER_COURIER]: [],
+        [FILTER_PRICE_RANGE]: null,
+      };
+
       // get the options from the url param
+      const filters =
+        req.query.filters && JSON.parse(req.query.filters);
       const listOfProductIds = req.query.productIds;
       const isWithFiles = req.query.isWithFiles;
       const isWithStoreInfo = req.query.isWithStoreInfo;
@@ -254,6 +273,9 @@ const InitDistributorRoute = (app) => {
 
       // initialize where option
       let whereOpt = {
+        status: ACTIVE,
+      };
+      let masterStoreWhereOpt = {
         status: ACTIVE,
       };
 
@@ -268,63 +290,146 @@ const InitDistributorRoute = (app) => {
           ...whereOpt,
         };
 
+      for (let i = 0; i < filters?.length; i++) {
+        if (!filters[i]?.value) continue;
+        if (filters[i]?.filter === FILTER_RATING) {
+          mapped[filters[i]?.filter].push({
+            [Op.gte]: parseInt(filters[i]?.value),
+          });
+        } else if (
+          filters[i]?.filter === FILTER_PRICE_RANGE &&
+          (filters[i]?.value.min !== 0 ||
+            filters[i]?.value.max !== 0)
+        ) {
+          mapped[filters[i]?.filter] = {
+            [Op.between]: [
+              parseInt(filters[i]?.value.min),
+              parseInt(filters[i]?.value.max),
+            ],
+          };
+        } else if (filters[i]?.filter === FILTER_COURIER) {
+          mapped[filters[i]?.filter].push({
+            [Op.like]:
+              `%${filters[i]?.value}%`.toUpperCase(),
+          });
+        } else if (
+          filters[i]?.filter === FILTER_STORE_LEVEL ||
+          filters[i]?.filter === FILTER_STORE_LOCATION
+        ) {
+          mapped[filters[i]?.filter].push(
+            filters[i]?.value
+          );
+        }
+      }
+
+      // map the filter array to each whereOptions
+      if (mapped[FILTER_STORE_LEVEL].length > 0)
+        masterStoreWhereOpt = {
+          ...masterStoreWhereOpt,
+          storeLevel: {
+            [Op.or]: [...mapped[FILTER_STORE_LEVEL]],
+          },
+        };
+      if (mapped[FILTER_PRICE_RANGE])
+        whereOpt = {
+          ...whereOpt,
+          productPrice: mapped[FILTER_PRICE_RANGE],
+        };
+      if (mapped[FILTER_RATING].length > 0)
+        whereOpt = {
+          ...whereOpt,
+          productRating: {
+            [Op.or]: [...mapped[FILTER_RATING]],
+          },
+        };
+      if (mapped[FILTER_COURIER].length > 0)
+        whereOpt = {
+          ...whereOpt,
+          availableCourierList: {
+            [Op.or]: [...mapped[FILTER_COURIER]],
+          },
+        };
+      if (mapped[FILTER_STORE_LOCATION].length > 0)
+        masterStoreWhereOpt = {
+          ...masterStoreWhereOpt,
+          storeProvince: {
+            [Op.or]: [...mapped[FILTER_STORE_LOCATION]],
+          },
+        };
+
       // map all the option before execute the query
       const options = {
         where: whereOpt,
+        group: ["MasterStoreDisplayItem.id"],
+        order: [
+          [defaultResultOrder, defaultResultOrderValue],
+        ],
+      };
+
+      // determine extra options
+      if (isWithFiles || isWithStoreInfo)
+        options.include = [];
+
+      // Optionally include the desired related model based on the the parameters
+      if (isWithFiles)
+        options.include.push({
+          model: MasterFile,
+          where: {
+            status: ACTIVE,
+          },
+        });
+
+      if (isWithStoreInfo) {
+        options.include.push({
+          model: MasterStoreCatalogue,
+          where: {
+            status: ACTIVE,
+          },
+          include: [
+            {
+              model: MasterStore,
+              where: masterStoreWhereOpt,
+              include: [
+                {
+                  model: MasterFile,
+                  where: {
+                    status: ACTIVE,
+                  },
+                  required: false,
+                },
+              ],
+            },
+          ],
+        });
+      }
+
+      const masterCountOption = {
+        ...cloneDeep(options),
       };
 
       // map offset and limit if both parameter present
       if (limit) options.limit = limit;
       if (offset) options.offset = offset * (limit || 0);
 
-      // Optionally include the desired related model based on the the parameters
-      if (isWithFiles || isWithStoreInfo) {
-        options.include = [];
-        isWithFiles &&
-          options.include.push({
-            model: MasterFile,
-          });
-        isWithStoreInfo &&
-          options.include.push({
-            model: MasterStoreCatalogue,
-            include: [
-              {
-                model: MasterStore,
-                include: [
-                  {
-                    model: MasterFile,
-                  },
-                ],
-              },
-            ],
-          });
-      }
-
-      let result;
-      let masterCount;
-      const masterCountOption = {
-        limit: 0,
-        offset: 0,
-        where: whereOpt,
-      };
       try {
-        result = await MasterStoreDisplayItem.findAll(
+        const result = await MasterStoreDisplayItem.findAll(
           options
         );
-        masterCount = await MasterStoreDisplayItem.count(
-          masterCountOption
-        );
+        const masterCount =
+          await MasterStoreDisplayItem.findAll(
+            masterCountOption
+          );
+
+        // assign values to the final response template
+        let response = {
+          result,
+          masterCount: masterCount.length,
+        };
+
+        return res.status(200).send(response);
       } catch (error) {
         SequelizeErrorHandling(error, res);
       }
-
-      // assign values to the final response template
-      let response = {
-        result,
-        masterCount,
-      };
-
-      return res.status(200).send(response);
     }
   );
 };
