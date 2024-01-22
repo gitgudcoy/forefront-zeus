@@ -263,6 +263,7 @@ const InitDistributorRoute = (app) => {
       // get the options from the url param
       const filters =
         req.query.filters && JSON.parse(req.query.filters);
+      const keyword = req.query.keyword;
       const listOfProductIds = req.query.productIds;
       const isWithFiles = req.query.isWithFiles;
       const isWithStoreInfo = req.query.isWithStoreInfo;
@@ -287,6 +288,14 @@ const InitDistributorRoute = (app) => {
             "id",
             "id"
           ),
+          ...whereOpt,
+        };
+
+      if (keyword)
+        whereOpt = {
+          productName: {
+            [Op.like]: `%${keyword}%`,
+          },
           ...whereOpt,
         };
 
