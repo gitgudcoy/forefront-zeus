@@ -264,6 +264,7 @@ const InitDistributorRoute = (app) => {
       const filters =
         req.query.filters && JSON.parse(req.query.filters);
       const keyword = req.query.keyword;
+      const category = req.query.category;
       const listOfProductIds = req.query.productIds;
       const isWithFiles = req.query.isWithFiles;
       const isWithStoreInfo = req.query.isWithStoreInfo;
@@ -380,6 +381,15 @@ const InitDistributorRoute = (app) => {
         options.include = [];
 
       // Optionally include the desired related model based on the the parameters
+      if (category)
+        options.include.push({
+          model: MasterCategory,
+          where: {
+            categoryName: category,
+            status: ACTIVE,
+          },
+        });
+
       if (isWithFiles)
         options.include.push({
           model: MasterFile,
