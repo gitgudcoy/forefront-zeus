@@ -6,17 +6,21 @@ const {
   InitDistributorRoute: generalDataDistributor,
 } = require("./src/routes/general-data-distributor");
 const {
+  InitDataStoringRoute: generalDataStorer,
+} = require("./src/routes/general-data-storing");
+const {
   InitDistributorRoute: productDataDistributor,
 } = require("./src/routes/product-data-distributor");
+const {
+  InitDataPatchingRoute: productDataPatcher,
+} = require("./src/routes/product-data-patching");
 const {
   InitDistributorRoute: userDataDistributor,
 } = require("./src/routes/user-data-distributor");
 const {
-  InitDataStoringRoute: generalDataStoring,
-} = require("./src/routes/general-data-storing");
-const {
-  InitDataStoringRoute: userDataStoring,
+  InitDataStoringRoute: userDataStorer,
 } = require("./src/routes/user-data-storing");
+
 var app = express();
 
 // Init App configurations
@@ -25,10 +29,11 @@ app = AppConfig(app, express);
 // Init Routes
 defaultRoute(app);
 generalDataDistributor(app);
+generalDataStorer(app);
 productDataDistributor(app);
+productDataPatcher(app);
 userDataDistributor(app);
-generalDataStoring(app);
-userDataStoring(app);
+userDataStorer(app);
 
 const port = process.env.PORT || 8004;
 app.listen(port, () => {

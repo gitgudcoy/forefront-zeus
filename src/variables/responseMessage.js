@@ -44,7 +44,7 @@ const PRODUCT_DISPLAY_VALIDATION_MESSAGES = {
     "Mohon input nama produk dengan benar \n\n 1. Nama produk minimal terdiri dari 3 karakter alfabet",
   INVALID_PRODUCT_CATEGORY:
     "Mohon input kategori produk dengan benar",
-  INVALID_PRODUCT_CATALOG:
+  INVALID_PRODUCT_CATALOGUE:
     "Mohon input nama katalog dengan benar",
   INVALID_PRODUCT_DESCRIPTION:
     "Mohon input deskripsi produk dengan benar",
@@ -62,6 +62,8 @@ const PRODUCT_DISPLAY_VALIDATION_MESSAGES = {
     "Mohon input jumlah stok dengan benar",
   INVALID_PRODUCT_SAFETY_STOCKS:
     "Mohon input jumlah safety stok dengan benar",
+  INVALID_PRODUCT_UOM:
+    "Mohon input satuan stok dengan benar",
   INVALID_COURIER_CHOOSEN:
     "Mohon input kurir yang dapat digunakan untuk penjemputan dengan benar",
   NO_PRODUCT_IMAGE_FOUND:

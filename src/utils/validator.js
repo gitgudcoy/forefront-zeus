@@ -112,6 +112,11 @@ function validateStoreInfo(data) {
 function validateProductDisplayInfo(data) {
   const validate = (field, regex, errorMessage) =>
     validateField(data[field], regex, errorMessage);
+  const validateCourier = (list) => {
+    for (let index = 0; index < list.length; index++) {
+      if (!list[index]) return true;
+    }
+  };
 
   return (
     validate(
@@ -130,14 +135,14 @@ function validateProductDisplayInfo(data) {
         PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATEGORY,
     }) ||
     validate(
-      "productCatalog",
+      "productCatalogue",
       NO_EMPTY_STRING,
-      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATALOG
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATALOGUE
     ) ||
-    (data.productCatalog === "undefined" && {
+    (data.productCatalogue === "undefined" && {
       result: null,
       message:
-        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATALOG,
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_CATALOGUE,
     }) ||
     validate(
       "productDescription",
@@ -199,7 +204,22 @@ function validateProductDisplayInfo(data) {
       message:
         PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_SAFETY_STOCKS,
     }) ||
+    validate(
+      "productUOM",
+      NO_EMPTY_STRING,
+      PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_UOM
+    ) ||
+    (data.productUOM === "undefined" && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_PRODUCT_UOM,
+    }) ||
     (JSON.parse(data.courierChoosen).length <= 0 && {
+      result: null,
+      message:
+        PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_COURIER_CHOOSEN,
+    }) ||
+    (validateCourier(JSON.parse(data.courierChoosen)) && {
       result: null,
       message:
         PRODUCT_DISPLAY_VALIDATION_MESSAGES.INVALID_COURIER_CHOOSEN,

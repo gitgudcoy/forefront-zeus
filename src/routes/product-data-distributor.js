@@ -116,12 +116,8 @@ const InitDistributorRoute = (app) => {
 
       // map all the query param
       const storeId = req.query.storeId || null;
-      const isWithProducts =
-        req.query.isWithProducts &&
-        JSON.parse(req.query.isWithProducts);
-      const isProductOnly =
-        req.query.isProductOnly &&
-        JSON.parse(req.query.isProductOnly);
+      const isWithProducts = req.query.isWithProducts;
+      const isProductOnly = req.query.isProductOnly;
       const offset =
         parseInt(req.query.offset, 10) || undefined;
       const limit =
@@ -261,6 +257,8 @@ const InitDistributorRoute = (app) => {
       };
 
       // get the options from the url param
+      const sortKey =
+        req.query.sortKey && JSON.parse(req.query.sortKey);
       const filters =
         req.query.filters && JSON.parse(req.query.filters);
       const keyword = req.query.keyword;
@@ -367,12 +365,16 @@ const InitDistributorRoute = (app) => {
           },
         };
 
+      console.log(sortKey);
       // map all the option before execute the query
       const options = {
         where: whereOpt,
         group: ["MasterStoreDisplayItem.id"],
         order: [
-          [defaultResultOrder, defaultResultOrderValue],
+          [
+            sortKey?.field || defaultResultOrder,
+            sortKey?.value || defaultResultOrderValue,
+          ],
         ],
       };
 

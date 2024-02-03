@@ -53,6 +53,7 @@ const multerInstance = require("multer")({
 const InitDataStoringRoute = (app) => {
   // POST Method
   // Route: /{version}/user/:id/stores/add
+  // Content type: multipart/form-data
   // This route will store users new requested store, though it still need approval later
   // TODO: To ease the development, this route will set the approval status to be "APPROVE" for now
   app.post(
@@ -323,8 +324,9 @@ const InitDataStoringRoute = (app) => {
               catalogueId: catalogues.find(
                 (obj) =>
                   obj.catalogueName ===
-                  productInfo.productCatalog
+                  productInfo.productCatalogue
               ).id,
+              uomId: JSON.parse(productInfo.productUOM).id,
             },
             { transaction: trx, lock: true }
           );
@@ -344,15 +346,15 @@ const InitDataStoringRoute = (app) => {
 
         // additional uploaded image files
         uploadedAdditionalFiles =
-          uploadedAdditionalFiles.map((obj) => {
-            return createMasterFile(
+          uploadedAdditionalFiles.map((obj) =>
+            createMasterFile(
               obj,
               PRODUCT_CATALOGUE_ADDITIONAL_FILES,
               {
                 displayItemId: displayItem.id,
               }
-            );
-          });
+            )
+          );
 
         // concat between uploaded files and additional uploaded files
         const fileConcat = uploadedImageFiles.concat(

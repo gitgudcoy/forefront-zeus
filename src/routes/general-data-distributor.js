@@ -4,6 +4,7 @@ const {
   MasterStoreChannels,
   MasterCourier,
   MasterFile,
+  MasterUOM,
 } = require("forefront-polus/src/models/index")();
 const {
   SequelizeErrorHandling,
@@ -13,7 +14,6 @@ const {
   UNIDENTIFIED_ERROR,
 } = require("../variables/responseMessage");
 const { ACTIVE } = require("../variables/general");
-const { splitArrayForGrid } = require("../utils/functions");
 
 const InitDistributorRoute = (app) => {
   /*GET Method
@@ -85,6 +85,27 @@ const InitDistributorRoute = (app) => {
     `/v${process.env.APP_MAJOR_VERSION}/category`,
     async (req, res) => {
       await MasterCategory.findAll({
+        where: {
+          status: ACTIVE,
+        },
+      })
+        .then((result) => {
+          return res.status(200).send(result);
+        })
+        .catch((error) => {
+          SequelizeErrorHandling(error, res);
+        });
+    }
+  );
+
+  /*GET Method
+   * ROUTE: /{version}/uom
+   * This route fetch all the selected app unit of measure datasets
+   */
+  app.get(
+    `/v${process.env.APP_MAJOR_VERSION}/uom`,
+    async (req, res) => {
+      await MasterUOM.findAll({
         where: {
           status: ACTIVE,
         },
