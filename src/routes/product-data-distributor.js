@@ -156,8 +156,11 @@ const InitDistributorRoute = (app) => {
             include: [
               {
                 model: MasterFile,
-                limit: 1,
+                limit: 5,
                 offset: 0,
+                where: {
+                  status: ACTIVE,
+                },
               },
             ],
           },
