@@ -12,6 +12,10 @@ exports.EMPLOYEE = "EMPLOYEE";
 exports.LEVEL_1 = "LEVEL_1";
 
 // Multer Names
+exports.UPLOADED_UPDATE_IMAGE_FILES =
+  "uploadedUpdateImageFiles";
+exports.UPLOADED_UPDATE_ADDITIONAL_FILES =
+  "uploadedUpdateAdditionalFiles";
 exports.UPLOADED_IMAGE_FILES = "uploadedImageFiles";
 exports.UPLOADED_ADDITIONAL_FILES =
   "uploadedAdditionalFiles";
@@ -32,6 +36,8 @@ exports.GET_CHECK_AUTH_TOKEN = "GET_CHECK_AUTH_TOKEN";
 exports.POST_SEND_PROFILEPIC = "POST_SEND_PROFILEPIC";
 exports.POST_ADD_CATALOGUE = "POST_ADD_CATALOGUE";
 exports.POST_UPLOAD_FILES = "POST_UPLOAD_FILES";
+exports.POST_UPLOAD_UPDATE_FILES =
+  "POST_UPLOAD_UPDATE_FILES";
 
 // Headers
 exports.X_SID = "x-sid";
@@ -45,6 +51,7 @@ exports.OTP_EMAIL =
 // API URLs
 exports.CHECK_AUTH_TOKEN = `/v${process.env.APP_OLYMPUS_SERVICE_MAJOR_VERSION}/auth/check`;
 exports.UPLOAD_FILES = `/v${process.env.APP_CHRONOS_MAJOR_VERSION}/files/upload`;
+exports.UPLOAD_UPDATE_FILES = `/v1/files/update`;
 
 // Statuses
 exports.ACTIVE = "ACTIVE";

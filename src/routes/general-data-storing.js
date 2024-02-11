@@ -332,16 +332,10 @@ const InitDataStoringRoute = (app) => {
           );
 
         // insert uploaded image
-        uploadedImageFiles = uploadedImageFiles.map(
-          (obj) => {
-            return createMasterFile(
-              obj,
-              PRODUCT_CATALOGUE_IMAGE,
-              {
-                displayItemId: displayItem.id,
-              }
-            );
-          }
+        uploadedImageFiles = uploadedImageFiles.map((obj) =>
+          createMasterFile(obj, PRODUCT_CATALOGUE_IMAGE, {
+            displayItemId: displayItem.id,
+          })
         );
 
         // additional uploaded image files
@@ -372,8 +366,7 @@ const InitDataStoringRoute = (app) => {
           endpoint: process.env.APP_CHRONOS_HOST_PORT,
           headers: {
             [AUTHORIZATION]: `Bearer ${
-              req.headers[AUTHORIZATION] &&
-              req.headers[AUTHORIZATION].split(" ")[1]
+              req.headers[AUTHORIZATION]?.split(" ")[1]
             }`,
             [X_SID]: req.headers[X_SID],
             [CONTENT_TYPE]: "multipart/form-data",
