@@ -332,28 +332,34 @@ const InitDataStoringRoute = (app) => {
           );
 
         // insert uploaded image
-        uploadedImageFiles = uploadedImageFiles.map((obj) =>
-          createMasterFile(obj, PRODUCT_CATALOGUE_IMAGE, {
-            displayItemId: displayItem.id,
-          })
-        );
+        uploadedImageFiles.forEach((obj, index, array) => {
+          array[index] = createMasterFile(
+            obj,
+            PRODUCT_CATALOGUE_IMAGE,
+            {
+              displayItemId: displayItem.id,
+            }
+          );
+        });
 
         // additional uploaded image files
-        uploadedAdditionalFiles =
-          uploadedAdditionalFiles.map((obj) =>
-            createMasterFile(
+        uploadedAdditionalFiles.forEach(
+          (obj, index, array) => {
+            array[index] = createMasterFile(
               obj,
               PRODUCT_CATALOGUE_ADDITIONAL_FILES,
               {
                 displayItemId: displayItem.id,
               }
-            )
-          );
+            );
+          }
+        );
 
         // concat between uploaded files and additional uploaded files
-        const fileConcat = uploadedImageFiles.concat(
-          uploadedAdditionalFiles
-        );
+        const fileConcat = [
+          ...uploadedImageFiles,
+          ...uploadedAdditionalFiles,
+        ];
 
         const formData = new FormData();
         formData.append(

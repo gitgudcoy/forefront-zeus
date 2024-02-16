@@ -12,8 +12,8 @@ const {
   InitDistributorRoute: productDataDistributor,
 } = require("./src/routes/product-data-distributor");
 const {
-  InitDataPatchingRoute: productDataPatcher,
-} = require("./src/routes/product-data-patching");
+  InitDataPatcherRoute: productDataPatcher,
+} = require("./src/routes/product-data-patcher");
 const {
   InitDistributorRoute: userDataDistributor,
 } = require("./src/routes/user-data-distributor");
