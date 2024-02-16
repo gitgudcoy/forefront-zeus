@@ -20,7 +20,7 @@ const InitDistributorRoute = (app) => {
    * This route fetch all the user stores datasets
    */
   app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores`,
+    `/v1/user/:id/stores`,
     checkAuth,
     async (req, res) => {
       // check query param availability
@@ -61,7 +61,7 @@ const InitDistributorRoute = (app) => {
    * This route fetch all the saved address datasets by user id
    */
   app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/user/:id/saved-address`,
+    `/v1/user/:id/saved-address`,
     checkAuth,
     async (req, res) => {
       // check query param availability

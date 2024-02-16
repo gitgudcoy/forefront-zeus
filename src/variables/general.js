@@ -56,8 +56,8 @@ exports.OTP_EMAIL =
   "Account Registration - Berikut adalah nomor OTPmu, jangan disebar ya !";
 
 // API URLs
-exports.CHECK_AUTH_TOKEN = `/v${process.env.APP_OLYMPUS_SERVICE_MAJOR_VERSION}/auth/check`;
-exports.UPLOAD_FILES = `/v${process.env.APP_CHRONOS_MAJOR_VERSION}/files/upload`;
+exports.CHECK_AUTH_TOKEN = `/v1/auth/check`;
+exports.UPLOAD_FILES = `/v1/files/upload`;
 exports.UPLOAD_UPDATE_FILES = `/v1/files/update`;
 exports.PURGE_FILES = `/v1/files/purge`;
 

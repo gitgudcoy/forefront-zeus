@@ -57,7 +57,7 @@ const InitDataStoringRoute = (app) => {
   // This route will store users new requested store, though it still need approval later
   // TODO: To ease the development, this route will set the approval status to be "APPROVE" for now
   app.post(
-    `/v${process.env.APP_MAJOR_VERSION}/user/:id/stores/add`,
+    `/v1/user/:id/stores/add`,
     checkAuth,
     multerInstance.single(UPLOADED_STORE_PROFILE_PICTURE),
     async (req, res) => {
@@ -224,7 +224,7 @@ const InitDataStoringRoute = (app) => {
   // This route will store users newly added product and catalogue, it doesn't need approval for now
   // TODO: create approval for later or approve it by DB first
   app.post(
-    `/v${process.env.APP_MAJOR_VERSION}/store/product/add`,
+    `/v1/store/product/add`,
     checkAuth,
     multerInstance.fields([
       { name: UPLOADED_IMAGE_FILES, maxCount: 5 },

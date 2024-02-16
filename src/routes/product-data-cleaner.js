@@ -26,7 +26,7 @@ const InitDataCleanerRoute = (app) => {
    * Based on the Id of the product
    */
   app.delete(
-    `/v${process.env.APP_MAJOR_VERSION}/store/product/delete`,
+    `/v1/store/product/delete`,
     checkAuth,
     async (req, res) => {
       const productId = req.query.productId;

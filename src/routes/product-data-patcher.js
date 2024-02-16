@@ -39,7 +39,7 @@ const InitDataPatcherRoute = (app) => {
    * This route will bulkUpdate the given product datas based on the Id of the product
    */
   app.patch(
-    `/v${process.env.APP_MAJOR_VERSION}/store/product/update`,
+    `/v1/store/product/update`,
     checkAuth,
     multerInstance.fields([
       { name: UPLOADED_UPDATE_IMAGE_FILES, maxCount: 5 },

@@ -19,7 +19,7 @@ const InitDataStoringRoute = (app) => {
   // Route: /{version}/user/:id/saved-address
   // This route will post the newly saved user address
   app.post(
-    `/v${process.env.APP_MAJOR_VERSION}/user/:id/saved-address`,
+    `/v1/user/:id/saved-address`,
     checkAuth,
     async (req, res) => {
       // check query param availability

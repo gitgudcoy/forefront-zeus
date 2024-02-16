@@ -32,7 +32,7 @@ const InitDistributorRoute = (app) => {
    * This route need productId param cause it used findByPk function
    */
   app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/store/catalogues/product-details`,
+    `/v1/store/catalogues/product-details`,
     async (req, res) => {
       // check query param availability
       if (!req.query)
@@ -107,7 +107,7 @@ const InitDistributorRoute = (app) => {
    * itemPerPage = item per page of the object set from the fetched MasterStoreDisplayItems (isWithProducts must TRUE)
    */
   app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/store/catalogues`,
+    `/v1/store/catalogues`,
     checkAuth,
     async (req, res) => {
       // check query param availability
@@ -241,221 +241,215 @@ const InitDistributorRoute = (app) => {
    * ROUTE: /{version}/products
    * We use this route to get the requested products by the given ids
    */
-  app.get(
-    `/v${process.env.APP_MAJOR_VERSION}/products`,
-    async (req, res) => {
-      // check query param availability
-      if (!req.query)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
+  app.get(`/v1/products`, async (req, res) => {
+    // check query param availability
+    if (!req.query)
+      return res.status(400).send(UNIDENTIFIED_ERROR);
 
-      // Variables
-      const defaultResultOrder = "createdAt";
-      const defaultResultOrderValue = "DESC";
-      let mapped = {
-        [FILTER_STORE_LEVEL]: [],
-        [FILTER_RATING]: [],
-        [FILTER_STORE_LOCATION]: [],
-        [FILTER_COURIER]: [],
-        [FILTER_PRICE_RANGE]: null,
+    // Variables
+    const defaultResultOrder = "createdAt";
+    const defaultResultOrderValue = "DESC";
+    let mapped = {
+      [FILTER_STORE_LEVEL]: [],
+      [FILTER_RATING]: [],
+      [FILTER_STORE_LOCATION]: [],
+      [FILTER_COURIER]: [],
+      [FILTER_PRICE_RANGE]: null,
+    };
+
+    // get the options from the url param
+    const sortKey =
+      req.query.sortKey && JSON.parse(req.query.sortKey);
+    const filters =
+      req.query.filters && JSON.parse(req.query.filters);
+    const keyword = req.query.keyword;
+    const category = req.query.category;
+    const listOfProductIds = req.query.productIds;
+    const isWithFiles = req.query.isWithFiles;
+    const isWithStoreInfo = req.query.isWithStoreInfo;
+    const offset =
+      parseInt(req.query.offset, 10) || undefined;
+    const limit =
+      parseInt(req.query.limit, 10) || undefined;
+
+    // initialize where option
+    let whereOpt = {
+      status: ACTIVE,
+    };
+    let masterStoreWhereOpt = {
+      status: ACTIVE,
+    };
+
+    // map all the listOfProductIds with sequelize Op.eq
+    if (listOfProductIds)
+      whereOpt = {
+        [Op.or]: mapListWithSequelizeOPEQ(
+          listOfProductIds,
+          "id",
+          "id"
+        ),
+        ...whereOpt,
       };
 
-      // get the options from the url param
-      const sortKey =
-        req.query.sortKey && JSON.parse(req.query.sortKey);
-      const filters =
-        req.query.filters && JSON.parse(req.query.filters);
-      const keyword = req.query.keyword;
-      const category = req.query.category;
-      const listOfProductIds = req.query.productIds;
-      const isWithFiles = req.query.isWithFiles;
-      const isWithStoreInfo = req.query.isWithStoreInfo;
-      const offset =
-        parseInt(req.query.offset, 10) || undefined;
-      const limit =
-        parseInt(req.query.limit, 10) || undefined;
-
-      // initialize where option
-      let whereOpt = {
-        status: ACTIVE,
-      };
-      let masterStoreWhereOpt = {
-        status: ACTIVE,
+    if (keyword)
+      whereOpt = {
+        productName: {
+          [Op.like]: `%${keyword}%`,
+        },
+        ...whereOpt,
       };
 
-      // map all the listOfProductIds with sequelize Op.eq
-      if (listOfProductIds)
-        whereOpt = {
-          [Op.or]: mapListWithSequelizeOPEQ(
-            listOfProductIds,
-            "id",
-            "id"
-          ),
-          ...whereOpt,
-        };
-
-      if (keyword)
-        whereOpt = {
-          productName: {
-            [Op.like]: `%${keyword}%`,
-          },
-          ...whereOpt,
-        };
-
-      for (let i = 0; i < filters?.length; i++) {
-        if (!filters[i]?.value) continue;
-        if (filters[i]?.filter === FILTER_RATING) {
-          mapped[filters[i]?.filter].push({
-            [Op.gte]: parseInt(filters[i]?.value),
-          });
-        } else if (
-          filters[i]?.filter === FILTER_PRICE_RANGE &&
-          (filters[i]?.value.min !== 0 ||
-            filters[i]?.value.max !== 0)
-        ) {
-          mapped[filters[i]?.filter] = {
-            [Op.between]: [
-              parseInt(filters[i]?.value.min),
-              parseInt(filters[i]?.value.max),
-            ],
-          };
-        } else if (filters[i]?.filter === FILTER_COURIER) {
-          mapped[filters[i]?.filter].push({
-            [Op.like]:
-              `%${filters[i]?.value}%`.toUpperCase(),
-          });
-        } else if (
-          filters[i]?.filter === FILTER_STORE_LEVEL ||
-          filters[i]?.filter === FILTER_STORE_LOCATION
-        ) {
-          mapped[filters[i]?.filter].push(
-            filters[i]?.value
-          );
-        }
-      }
-
-      // map the filter array to each whereOptions
-      if (mapped[FILTER_STORE_LEVEL].length > 0)
-        masterStoreWhereOpt = {
-          ...masterStoreWhereOpt,
-          storeLevel: {
-            [Op.or]: [...mapped[FILTER_STORE_LEVEL]],
-          },
-        };
-      if (mapped[FILTER_PRICE_RANGE])
-        whereOpt = {
-          ...whereOpt,
-          productPrice: mapped[FILTER_PRICE_RANGE],
-        };
-      if (mapped[FILTER_RATING].length > 0)
-        whereOpt = {
-          ...whereOpt,
-          productRating: {
-            [Op.or]: [...mapped[FILTER_RATING]],
-          },
-        };
-      if (mapped[FILTER_COURIER].length > 0)
-        whereOpt = {
-          ...whereOpt,
-          availableCourierList: {
-            [Op.or]: [...mapped[FILTER_COURIER]],
-          },
-        };
-      if (mapped[FILTER_STORE_LOCATION].length > 0)
-        masterStoreWhereOpt = {
-          ...masterStoreWhereOpt,
-          storeProvince: {
-            [Op.or]: [...mapped[FILTER_STORE_LOCATION]],
-          },
-        };
-
-      console.log(sortKey);
-      // map all the option before execute the query
-      const options = {
-        where: whereOpt,
-        group: ["MasterStoreDisplayItem.id"],
-        order: [
-          [
-            sortKey?.field || defaultResultOrder,
-            sortKey?.value || defaultResultOrderValue,
+    for (let i = 0; i < filters?.length; i++) {
+      if (!filters[i]?.value) continue;
+      if (filters[i]?.filter === FILTER_RATING) {
+        mapped[filters[i]?.filter].push({
+          [Op.gte]: parseInt(filters[i]?.value),
+        });
+      } else if (
+        filters[i]?.filter === FILTER_PRICE_RANGE &&
+        (filters[i]?.value.min !== 0 ||
+          filters[i]?.value.max !== 0)
+      ) {
+        mapped[filters[i]?.filter] = {
+          [Op.between]: [
+            parseInt(filters[i]?.value.min),
+            parseInt(filters[i]?.value.max),
           ],
-        ],
-      };
-
-      // determine extra options
-      if (isWithFiles || isWithStoreInfo)
-        options.include = [];
-
-      // Optionally include the desired related model based on the the parameters
-      if (category)
-        options.include.push({
-          model: MasterCategory,
-          where: {
-            categoryName: category,
-            status: ACTIVE,
-          },
-        });
-
-      if (isWithFiles)
-        options.include.push({
-          model: MasterFile,
-          where: {
-            status: ACTIVE,
-          },
-        });
-
-      if (isWithStoreInfo) {
-        options.include.push({
-          model: MasterStoreCatalogue,
-          where: {
-            status: ACTIVE,
-          },
-          include: [
-            {
-              model: MasterStore,
-              where: masterStoreWhereOpt,
-              include: [
-                {
-                  model: MasterFile,
-                  where: {
-                    status: ACTIVE,
-                  },
-                  required: false,
-                },
-              ],
-            },
-          ],
-        });
-      }
-
-      const masterCountOption = {
-        ...cloneDeep(options),
-      };
-
-      // map offset and limit if both parameter present
-      if (limit) options.limit = limit;
-      if (offset) options.offset = offset * (limit || 0);
-
-      try {
-        const result = await MasterStoreDisplayItem.findAll(
-          options
-        );
-        const masterCount =
-          await MasterStoreDisplayItem.findAll(
-            masterCountOption
-          );
-
-        // assign values to the final response template
-        let response = {
-          result,
-          masterCount: masterCount.length,
         };
-
-        return res.status(200).send(response);
-      } catch (error) {
-        SequelizeErrorHandling(error, res);
+      } else if (filters[i]?.filter === FILTER_COURIER) {
+        mapped[filters[i]?.filter].push({
+          [Op.like]: `%${filters[i]?.value}%`.toUpperCase(),
+        });
+      } else if (
+        filters[i]?.filter === FILTER_STORE_LEVEL ||
+        filters[i]?.filter === FILTER_STORE_LOCATION
+      ) {
+        mapped[filters[i]?.filter].push(filters[i]?.value);
       }
     }
-  );
+
+    // map the filter array to each whereOptions
+    if (mapped[FILTER_STORE_LEVEL].length > 0)
+      masterStoreWhereOpt = {
+        ...masterStoreWhereOpt,
+        storeLevel: {
+          [Op.or]: [...mapped[FILTER_STORE_LEVEL]],
+        },
+      };
+    if (mapped[FILTER_PRICE_RANGE])
+      whereOpt = {
+        ...whereOpt,
+        productPrice: mapped[FILTER_PRICE_RANGE],
+      };
+    if (mapped[FILTER_RATING].length > 0)
+      whereOpt = {
+        ...whereOpt,
+        productRating: {
+          [Op.or]: [...mapped[FILTER_RATING]],
+        },
+      };
+    if (mapped[FILTER_COURIER].length > 0)
+      whereOpt = {
+        ...whereOpt,
+        availableCourierList: {
+          [Op.or]: [...mapped[FILTER_COURIER]],
+        },
+      };
+    if (mapped[FILTER_STORE_LOCATION].length > 0)
+      masterStoreWhereOpt = {
+        ...masterStoreWhereOpt,
+        storeProvince: {
+          [Op.or]: [...mapped[FILTER_STORE_LOCATION]],
+        },
+      };
+
+    console.log(sortKey);
+    // map all the option before execute the query
+    const options = {
+      where: whereOpt,
+      group: ["MasterStoreDisplayItem.id"],
+      order: [
+        [
+          sortKey?.field || defaultResultOrder,
+          sortKey?.value || defaultResultOrderValue,
+        ],
+      ],
+    };
+
+    // determine extra options
+    if (isWithFiles || isWithStoreInfo)
+      options.include = [];
+
+    // Optionally include the desired related model based on the the parameters
+    if (category)
+      options.include.push({
+        model: MasterCategory,
+        where: {
+          categoryName: category,
+          status: ACTIVE,
+        },
+      });
+
+    if (isWithFiles)
+      options.include.push({
+        model: MasterFile,
+        where: {
+          status: ACTIVE,
+        },
+      });
+
+    if (isWithStoreInfo) {
+      options.include.push({
+        model: MasterStoreCatalogue,
+        where: {
+          status: ACTIVE,
+        },
+        include: [
+          {
+            model: MasterStore,
+            where: masterStoreWhereOpt,
+            include: [
+              {
+                model: MasterFile,
+                where: {
+                  status: ACTIVE,
+                },
+                required: false,
+              },
+            ],
+          },
+        ],
+      });
+    }
+
+    const masterCountOption = {
+      ...cloneDeep(options),
+    };
+
+    // map offset and limit if both parameter present
+    if (limit) options.limit = limit;
+    if (offset) options.offset = offset * (limit || 0);
+
+    try {
+      const result = await MasterStoreDisplayItem.findAll(
+        options
+      );
+      const masterCount =
+        await MasterStoreDisplayItem.findAll(
+          masterCountOption
+        );
+
+      // assign values to the final response template
+      let response = {
+        result,
+        masterCount: masterCount.length,
+      };
+
+      return res.status(200).send(response);
+    } catch (error) {
+      SequelizeErrorHandling(error, res);
+    }
+  });
 };
 
 module.exports = {
