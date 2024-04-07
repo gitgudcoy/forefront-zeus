@@ -4,7 +4,7 @@ const {
   MasterStoreCatalogue,
   MasterStoreChannels,
   MasterStoreDisplayItem,
-  MasterStoreEmployees,
+  MasterStoreRoles,
 } = require("forefront-polus/src/models/index")();
 const { POSTRequest } = require("../utils/axios/post");
 const { generateCode } = require("../utils/formater");
@@ -34,8 +34,8 @@ const {
   AUTHORIZATION,
   X_SID,
   CONTENT_TYPE,
-  LEVEL_1,
-  EMPLOYEE,
+  OWNER,
+  STORE_OWNER,
 } = require("../variables/general");
 const {
   MASTER_STORE_CHANNELS_SEED,
@@ -46,6 +46,16 @@ const {
   INTERNAL_ERROR_CANT_COMMUNICATE,
   PRODUCT_DISPLAY_VALIDATION_MESSAGES,
 } = require("../variables/responseMessage");
+const {
+  MasterStoreRolesAccesses,
+} = require("forefront-polus/src/models/objects/master_stores_roles_accesses");
+const {
+  MasterStoreUserRoles,
+} = require("forefront-polus/src/models/objects/master_stores_user_roles");
+const {
+  MasterAccess,
+} = require("forefront-polus/src/models/user/master_access");
+const { uuid } = require("uuidv4");
 const multerInstance = require("multer")({
   limits: { fieldSize: 25 * 1024 * 1024 },
 });
@@ -110,10 +120,27 @@ const InitDataStoringRoute = (app) => {
         });
 
         // create store owner relationship
-        const owner = {
-          userId: req.user.userId,
-          employeeRoles: `[${EMPLOYEE}, ${LEVEL_1}]`,
+        const access = await MasterAccess.findOne({
+          where: {
+            accessName: STORE_OWNER,
+            status: ACTIVE,
+          },
+        });
+
+        const newRoleUUID = uuid();
+        const newRole = {
+          roleName: OWNER,
           status: ACTIVE,
+          MasterStoreRolesAccesses: {
+            storeRoleId: newRoleUUID,
+            accessId: access.id,
+            status: ACTIVE,
+          },
+          MasterStoreUserRoles: {
+            storeRoleId: newRoleUUID,
+            userId: req.user.userId,
+            status: ACTIVE,
+          },
         };
 
         // create the store payload
@@ -137,7 +164,7 @@ const InitDataStoringRoute = (app) => {
           userId: storeInfo.userId,
           status: ACTIVE,
           MasterStoreChannels: newChannels,
-          MasterStoreEmployees: owner,
+          MasterStoreRoles: newRole,
         };
 
         const store = await MasterStore.create(inserting, {
@@ -149,8 +176,18 @@ const InitDataStoringRoute = (app) => {
               as: "MasterStoreChannels",
             },
             {
-              model: MasterStoreEmployees,
-              as: "MasterStoreEmployees",
+              model: MasterStoreRoles,
+              as: "MasterStoreRoles",
+              include: [
+                {
+                  model: MasterStoreRolesAccesses,
+                  as: "MasterStoreRolesAccesses",
+                },
+                {
+                  model: MasterStoreUserRoles,
+                  as: "MasterStoreUserRoles",
+                },
+              ],
             },
           ],
         });

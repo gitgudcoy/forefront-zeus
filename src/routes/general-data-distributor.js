@@ -30,6 +30,7 @@ const InitDistributorRoute = (app) => {
     // DB request option declaration
     const storeId = req.query.storeId;
     const isWithFiles = req.query.isWithFiles;
+    const limit = req.query.limit;
 
     // initialize where option
     let whereOpt = {

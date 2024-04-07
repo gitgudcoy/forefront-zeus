@@ -1,3 +1,8 @@
+// APP STATE
+exports.DEV = "DEV";
+exports.PREPROD = "PREPROD";
+exports.PROD = "PROD";
+
 // Constants
 exports.ADMIN = "ADMIN";
 exports.USER = "USER";
@@ -7,9 +12,9 @@ exports.PRODUCT_CATALOGUE_IMAGE = "PRODUCT_CATALOGUE_IMAGE";
 exports.PRODUCT_CATALOGUE_ADDITIONAL_FILES =
   "PRODUCT_CATALOGUE_ADDITIONAL_FILES";
 
-// Store Roles
-exports.EMPLOYEE = "EMPLOYEE";
-exports.LEVEL_1 = "LEVEL_1";
+// Store initial roleName and accessName
+exports.OWNER = "Owner";
+exports.STORE_OWNER = "STORE_OWNER";
 
 // multipart/form-data file field Names
 exports.REMOVED_IMAGE_FILES_DATA = "removedImageFilesData";

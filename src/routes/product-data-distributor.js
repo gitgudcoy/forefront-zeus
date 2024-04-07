@@ -363,7 +363,6 @@ const InitDistributorRoute = (app) => {
         },
       };
 
-    console.log(sortKey);
     // map all the option before execute the query
     const options = {
       where: whereOpt,

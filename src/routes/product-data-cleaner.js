@@ -20,7 +20,7 @@ const {
 const { DELETERequest } = require("../utils/axios/delete");
 
 const InitDataCleanerRoute = (app) => {
-  /*PATCH Method
+  /*DELETE Method
    * ROUTE: /{version}/store/product/delete
    * This route will delete the given product data from the database\
    * Based on the Id of the product
@@ -29,7 +29,7 @@ const InitDataCleanerRoute = (app) => {
     `/v1/store/product/delete`,
     checkAuth,
     async (req, res) => {
-      const productId = req.query.productId;
+      const productId = req.query.id;
       const trx = await db.transaction();
       try {
         // Check if the product exists

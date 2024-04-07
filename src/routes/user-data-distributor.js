@@ -1,6 +1,5 @@
 const {
   SequelizeErrorHandling,
-  mapListWithSequelizeOPEQ,
 } = require("forefront-polus/src/utils/functions");
 const { checkAuth } = require("../utils/middleware");
 const { ACTIVE } = require("../variables/general");
@@ -9,10 +8,22 @@ const {
 } = require("../variables/responseMessage");
 const { Op } = require("sequelize");
 const {
-  MasterUserBuyAddresses,
-  MasterStore,
-  MasterStoreEmployees,
-} = require("forefront-polus/src/models/index")();
+  MasterFile,
+} = require("forefront-polus/src/models/objects/master_file");
+const {
+  MasterStoreRoles,
+} = require("forefront-polus/src/models/objects/master_stores_roles");
+const {
+  MasterStoreUserRoles,
+} = require("forefront-polus/src/models/objects/master_stores_user_roles");
+const {
+  MasterAccess,
+} = require("forefront-polus/src/models/user/master_access");
+const {
+  MasterStoreRolesAccesses,
+} = require("forefront-polus/src/models/objects/master_stores_roles_accesses");
+const { MasterUserBuyAddresses, MasterStore } =
+  require("forefront-polus/src/models/index")();
 
 const InitDistributorRoute = (app) => {
   /*GET Method
@@ -23,31 +34,44 @@ const InitDistributorRoute = (app) => {
     `/v1/user/:id/stores`,
     checkAuth,
     async (req, res) => {
-      // check query param availability
-      if (!req.params)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
       // Get the request body
       const userId = req.params.id;
+      const defaultResultOrder = "createdAt";
+      const defaultResultOrderValue = "ASC";
+
       // use try catch for error handling
       try {
-        const employeeStoreRelations =
-          await MasterStoreEmployees.findAll({
-            where: {
-              userId: userId,
-              status: ACTIVE,
-            },
-          });
-
         const result = await MasterStore.findAll({
           where: {
-            [Op.or]: mapListWithSequelizeOPEQ(
-              employeeStoreRelations,
-              "id",
-              "storeId"
-            ),
             status: ACTIVE,
           },
-          include: MasterStoreEmployees,
+          order: [
+            [defaultResultOrder, defaultResultOrderValue],
+          ],
+          include: [
+            {
+              model: MasterFile,
+              limit: 1,
+              offset: 0,
+            },
+            {
+              model: MasterStoreRoles,
+              include: [
+                {
+                  model: MasterStoreUserRoles,
+                  where: {
+                    userId: userId,
+                    status: ACTIVE,
+                  },
+                },
+                {
+                  model: MasterStoreRolesAccesses,
+                  include: [MasterAccess, MasterStoreRoles],
+                },
+              ],
+              required: true,
+            },
+          ],
         });
         return res.status(200).send(result);
       } catch (error) {
