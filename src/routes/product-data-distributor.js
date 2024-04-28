@@ -366,7 +366,7 @@ const InitDistributorRoute = (app) => {
     // map all the option before execute the query
     const options = {
       where: whereOpt,
-      group: ["MasterStoreDisplayItem.id"],
+      //group: ["MasterStoreDisplayItem.id"], //FIXME: Error when grouping, before data wipe this is functioning well
       order: [
         [
           sortKey?.field || defaultResultOrder,
