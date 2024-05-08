@@ -3,6 +3,9 @@ const express = require("express");
 const { defaultRoute } = require("./src/routes/default");
 const { AppConfig } = require("./src/config");
 const {
+  InitDistributorRoute: creativeStoreDataDistributor,
+} = require("./src/routes/creative-store-data-distributor");
+const {
   InitDistributorRoute: generalDataDistributor,
 } = require("./src/routes/general-data-distributor");
 const {
@@ -31,6 +34,7 @@ const { server, app } = AppConfig(expressApp, express);
 
 // Init Routes
 defaultRoute(app);
+creativeStoreDataDistributor(app);
 generalDataDistributor(app);
 generalDataStorer(app);
 productDataDistributor(app);

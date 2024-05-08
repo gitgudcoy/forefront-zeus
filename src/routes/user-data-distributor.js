@@ -81,7 +81,7 @@ const InitDistributorRoute = (app) => {
   );
 
   /*GET Method
-   * ROUTE: /{version}/couriers
+   * ROUTE: /{version}/user/:id/saved-address
    * This route fetch all the saved address datasets by user id
    */
   app.get(
@@ -108,6 +108,138 @@ const InitDistributorRoute = (app) => {
         });
     }
   );
+
+  /*GET Method
+   * ROUTE: /{version}/user/:id/roles
+   * This route fetch store role info based on the user id
+   */
+  app.get(`/v1/user/:id/roles`, async (req, res) => {
+    // check query param availability
+    if (!req.params.id)
+      return res.status(500).send(UNIDENTIFIED_ERROR);
+
+    // DB request option declaration
+    const userId = req.params.id;
+    const storeId = req.query.storeId;
+
+    // fetch all role related to the store
+    try {
+      let whereOpt = {
+        userId: userId,
+        status: ACTIVE,
+      };
+
+      let whereOpt2 = {
+        status: ACTIVE,
+      };
+
+      if (!!storeId)
+        whereOpt2 = {
+          ...whereOpt2,
+          storeId: storeId,
+        };
+
+      let includeOpt = [];
+
+      includeOpt.push({
+        model: MasterStoreRoles,
+        as: "MasterStoreRole",
+        where: whereOpt2,
+        include: [
+          {
+            model: MasterStoreRolesAccesses,
+            as: "MasterStoreRolesAccesses",
+            include: [
+              {
+                model: MasterAccess,
+                as: "MasterAccess",
+              },
+            ],
+          },
+        ],
+      });
+
+      // keep it outer join
+      const options = {
+        where: whereOpt,
+        include: includeOpt,
+      };
+
+      const roles = await MasterStoreUserRoles.findAll(
+        options
+      );
+
+      return res.send(roles).status(200);
+    } catch (error) {
+      SequelizeErrorHandling(error, res);
+    }
+  });
+
+  /*GET Method
+   * ROUTE: /{version}/user/:id/memberships
+   * This route fetch store role info based on the user id
+   */
+  app.get(`/v1/user/:id/memberships`, async (req, res) => {
+    // check query param availability
+    if (!req.params.id)
+      return res.status(500).send(UNIDENTIFIED_ERROR);
+
+    // DB request option declaration
+    const userId = req.params.id;
+    const storeId = req.query.storeId;
+
+    // fetch all role related to the store
+    try {
+      let whereOpt = {
+        userId: userId,
+        status: ACTIVE,
+      };
+
+      let whereOpt2 = {
+        status: ACTIVE,
+      };
+
+      if (!!storeId)
+        whereOpt2 = {
+          ...whereOpt2,
+          storeId: storeId,
+        };
+
+      let includeOpt = [];
+
+      includeOpt.push({
+        model: MasterStoreRoles,
+        as: "MasterStoreRole",
+        where: whereOpt2,
+        include: [
+          {
+            model: MasterStoreRolesAccesses,
+            as: "MasterStoreRolesAccesses",
+            include: [
+              {
+                model: MasterAccess,
+                as: "MasterAccess",
+              },
+            ],
+          },
+        ],
+      });
+
+      // keep it outer join
+      const options = {
+        where: whereOpt,
+        include: includeOpt,
+      };
+
+      const roles = await MasterStoreUserRoles.findAll(
+        options
+      );
+
+      return res.send(roles).status(200);
+    } catch (error) {
+      SequelizeErrorHandling(error, res);
+    }
+  });
 };
 
 module.exports = {

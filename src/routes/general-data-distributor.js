@@ -23,10 +23,6 @@ const InitDistributorRoute = (app) => {
    * TODO: give limit to the data requested
    */
   app.get(`/v1/stores`, async (req, res) => {
-    // check query param availability
-    if (!req.query)
-      return res.status(500).send(UNIDENTIFIED_ERROR);
-
     // DB request option declaration
     const storeId = req.query.storeId;
     const isWithFiles = req.query.isWithFiles;

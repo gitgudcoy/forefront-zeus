@@ -36,6 +36,7 @@ const {
   CONTENT_TYPE,
   OWNER,
   STORE_OWNER,
+  EVERYONE,
 } = require("../variables/general");
 const {
   MASTER_STORE_CHANNELS_SEED,
@@ -56,6 +57,9 @@ const {
   MasterAccess,
 } = require("forefront-polus/src/models/user/master_access");
 const { uuid } = require("uuidv4");
+const {
+  CREATIVE_STORE_ACCESS,
+} = require("forefront-polus/src/variables/general");
 const multerInstance = require("multer")({
   limits: { fieldSize: 25 * 1024 * 1024 },
 });
@@ -72,9 +76,7 @@ const InitDataStoringRoute = (app) => {
     multerInstance.single(UPLOADED_STORE_PROFILE_PICTURE),
     async (req, res) => {
       // check query param availability
-      if (!req.body)
-        return res.status(400).send(UNIDENTIFIED_ERROR);
-      if (!req.params)
+      if (!req.params.id)
         return res.status(400).send(UNIDENTIFIED_ERROR);
 
       // Validate req body
@@ -120,27 +122,65 @@ const InitDataStoringRoute = (app) => {
         });
 
         // create store owner relationship
-        const access = await MasterAccess.findOne({
+        const storeOwnerAccess = await MasterAccess.findOne(
+          {
+            where: {
+              accessName: STORE_OWNER,
+              status: ACTIVE,
+            },
+          }
+        );
+        const everyoneAccess = await MasterAccess.findAll({
           where: {
-            accessName: STORE_OWNER,
+            accessType: CREATIVE_STORE_ACCESS,
             status: ACTIVE,
           },
         });
 
-        const newRoleUUID = uuid();
-        const newRole = {
+        // generate uuid for new roles
+        const storeOwnerRoleUUID = uuid();
+        const everyoneRoleUUID = uuid();
+
+        // create store owner role, immutable
+        const storeOwnerRole = {
           roleName: OWNER,
+          addOnConsentScreen: 0,
+          isMutable: 0,
+          isDestroyable: 0,
+          isEveryone: 0,
           status: ACTIVE,
           MasterStoreRolesAccesses: {
-            storeRoleId: newRoleUUID,
-            accessId: access.id,
+            storeRoleId: storeOwnerRoleUUID,
+            accessId: storeOwnerAccess.id,
             status: ACTIVE,
           },
           MasterStoreUserRoles: {
-            storeRoleId: newRoleUUID,
+            storeRoleId: storeOwnerRoleUUID,
             userId: req.user.userId,
             status: ACTIVE,
           },
+        };
+
+        // create base role for everyone, for all user but mutable
+        const everyoneRole = {
+          roleName: EVERYONE,
+          addOnConsentScreen: 0,
+          isMutable: 1,
+          isDestroyable: 0,
+          isEveryone: 1,
+          status: ACTIVE,
+          MasterStoreRolesAccesses: [
+            {
+              storeRoleId: everyoneRoleUUID,
+              accessId: everyoneAccess[0].id,
+              status: ACTIVE,
+            },
+            {
+              storeRoleId: everyoneRoleUUID,
+              accessId: everyoneAccess[1].id,
+              status: ACTIVE,
+            },
+          ],
         };
 
         // create the store payload
@@ -164,7 +204,7 @@ const InitDataStoringRoute = (app) => {
           userId: storeInfo.userId,
           status: ACTIVE,
           MasterStoreChannels: newChannels,
-          MasterStoreRoles: newRole,
+          MasterStoreRoles: [storeOwnerRole, everyoneRole],
         };
 
         const store = await MasterStore.create(inserting, {

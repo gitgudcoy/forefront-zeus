@@ -12,8 +12,11 @@ exports.PRODUCT_CATALOGUE_IMAGE = "PRODUCT_CATALOGUE_IMAGE";
 exports.PRODUCT_CATALOGUE_ADDITIONAL_FILES =
   "PRODUCT_CATALOGUE_ADDITIONAL_FILES";
 
-// Store initial roleName and accessName
+// Store initial roleName
 exports.OWNER = "Owner";
+exports.EVERYONE = "Everyone";
+
+// master access "accessName" common access name
 exports.STORE_OWNER = "STORE_OWNER";
 
 // multipart/form-data file field Names
