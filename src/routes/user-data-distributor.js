@@ -22,6 +22,9 @@ const {
 const {
   MasterStoreRolesAccesses,
 } = require("forefront-polus/src/models/objects/master_stores_roles_accesses");
+const {
+  MasterStoreMembers,
+} = require("forefront-polus/src/models/objects/master_stores_members");
 const { MasterUserBuyAddresses, MasterStore } =
   require("forefront-polus/src/models/index")();
 
@@ -177,69 +180,47 @@ const InitDistributorRoute = (app) => {
 
   /*GET Method
    * ROUTE: /{version}/user/:id/memberships
-   * This route fetch store role info based on the user id
+   * This route fetch all users store memberships
    */
-  app.get(`/v1/user/:id/memberships`, async (req, res) => {
-    // check query param availability
-    if (!req.params.id)
-      return res.status(500).send(UNIDENTIFIED_ERROR);
+  app.get(
+    `/v1/user/:id/store-memberships`,
+    async (req, res) => {
+      // check query param availability
+      if (!req.params.id)
+        return res.status(500).send(UNIDENTIFIED_ERROR);
 
-    // DB request option declaration
-    const userId = req.params.id;
-    const storeId = req.query.storeId;
+      // DB request option declaration
+      const userId = req.params.id;
+      // store id is if the client wants specific store membershipment check
+      const storeId = req.query.storeId;
 
-    // fetch all role related to the store
-    try {
-      let whereOpt = {
-        userId: userId,
-        status: ACTIVE,
-      };
-
-      let whereOpt2 = {
-        status: ACTIVE,
-      };
-
-      if (!!storeId)
-        whereOpt2 = {
-          ...whereOpt2,
-          storeId: storeId,
+      // fetch all role related to the store
+      try {
+        let whereOpt = {
+          userId: userId,
+          status: ACTIVE,
         };
 
-      let includeOpt = [];
+        if (!!storeId)
+          whereOpt = {
+            ...whereOpt,
+            storeId: storeId,
+          };
 
-      includeOpt.push({
-        model: MasterStoreRoles,
-        as: "MasterStoreRole",
-        where: whereOpt2,
-        include: [
-          {
-            model: MasterStoreRolesAccesses,
-            as: "MasterStoreRolesAccesses",
-            include: [
-              {
-                model: MasterAccess,
-                as: "MasterAccess",
-              },
-            ],
-          },
-        ],
-      });
+        // keep it outer join
+        const options = {
+          where: whereOpt,
+        };
 
-      // keep it outer join
-      const options = {
-        where: whereOpt,
-        include: includeOpt,
-      };
+        const memberships =
+          await MasterStoreMembers.findAll(options);
 
-      const roles = await MasterStoreUserRoles.findAll(
-        options
-      );
-
-      return res.send(roles).status(200);
-    } catch (error) {
-      SequelizeErrorHandling(error, res);
+        return res.send(memberships).status(200);
+      } catch (error) {
+        SequelizeErrorHandling(error, res);
+      }
     }
-  });
+  );
 };
 
 module.exports = {
