@@ -23,7 +23,7 @@
     "sequelize": "^6.28.0",
     "uuidv4": "^6.2.13"
   },
-  "name": "zeus",
+  "name": "forefront-zeus",
   "version": "0.1.0",
   "main": "index.js",
   "compilerOptions": {
